@@ -35,7 +35,7 @@ $mod_name = 'Membership Management';
 * The name of the config variable which will hold the currently installed version
 * UMIL will handle checking, setting, and updating the version itself.
 */
-$version_config_name = 'membership_manager_version';
+$version_config_name = 'memberman_version';
 
 
 // The language file which will be included when installing
@@ -60,7 +60,14 @@ $versions = array(
     '0.0.11'	=> array(
 		'module_add' => array(
 		    array('acp', 'ACP_CAT_USERS', array(
-		            'module_basename'       => 'membership',
+		            'module_basename'   => 'users',
+                    'module_enabled'    => 1,
+                    'module_display'    => 0,
+                    'module_class'      => 'acp',
+                    'parent_id'         => 'ACP_CAT_USERS',
+                    'module_langname'   => 'ACP_USERS_MEMBERSHIP',
+                    'module_mode'       => 'users_membership',
+                    'module_auth'       => 'acl_a_user',
 		        ),
 		    ),
         ),
