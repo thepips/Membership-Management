@@ -1,0 +1,47 @@
+<!-- INCLUDE overall_header.html -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<a name="maincontent"></a> 
+<form method="post" action="{ACTION}">
+	<!-- IF MESSAGE -->			
+		{MESSAGE}
+	<!-- ENDIF -->
+	<br />
+        
+    {PAYMENT_REF}<br /><br />
+	<fieldset>
+	<!-- IF PAYMENT_TYPE == 'cheque' -->
+
+		<legend>{L_PAY_BY_CHEQUE}</legend>
+  <dl>
+			<dt><label>{L_PP_CHEQUE_ADDRESS}:</label></dt>
+			<dd><textarea rows="5" cols="50" name="address">{PP_CHEQUE_ADDRESS}</textarea><br /><br /></dd>
+	<!-- ELSEIF PAYMENT_TYPE == 'eft' -->
+		<legend>{L_PAY_BY_EFT}</legend>
+		<dl>
+			<dt><label>{L_PP_EFT_BANKNAME}:</label></dt>
+			<dd>{PP_EFT_BANKNAME}</dd>
+		</dl>
+		<dl>
+			<dt><label>{L_PP_EFT_BANKCODE}:</label></dt>
+			<dd>{PP_EFT_BANKCODE}</dd>
+		</dl>
+		<dl>
+			<dt><label>{L_PP_EFT_ACCOUNT}:</label></dt>
+			<dd>{PP_EFT_ACCOUNT}</dd>
+		</dl>
+		<dl>
+			<dt><label>{L_PP_EFT_BANKADDRESS}:</label></dt>
+			<dd><textarea rows="5" cols="50" name="pp_eft_bankaddress">{PP_EFT_BANKADDRESS}</textarea></dd>
+		</dl>
+	<!-- ENDIF -->
+	</fieldset>
+	<p class="submit-buttons">
+		<input class="button" type="submit" id="submit" name="submit" value="{L_SUBMIT}" />&nbsp;
+	<!-- IF PAYMENT_TYPE != '' -->
+		<input class="button" type="submit" id="backout" name="backout" value="{L_CANCEL}" />
+	<!-- ENDIF -->
+	</p>
+{S_FORM_TOKEN}
+</form>
+<br clear="all">
+<!-- INCLUDE overall_footer.html -->

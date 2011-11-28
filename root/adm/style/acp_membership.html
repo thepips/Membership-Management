@@ -1,0 +1,77 @@
+<!-- INCLUDE overall_header.html -->
+
+<a name="maincontent"></a>
+
+<h2>{L_MEMBERSHIP_MANAGEMENT}</h2>
+
+<p>{L_MEMBERSHIP_MANAGEMENT_EXPLAIN}</p>
+
+Click <a href="{U_GENERATION}">Here</a> to run membership reports
+<form id="members" method="post" action="{U_ACTION}">
+
+<div class="clearfix"></div>
+
+<!-- IF PAGINATION -->
+<div class="pagination">
+	<a href="#" onclick="jumpto(); return false;" title="{L_JUMP_TO_PAGE}">{S_ON_PAGE}</a> &bull; <span>{PAGINATION}</span>
+</div>
+<!-- ENDIF -->
+
+<table cellspacing="1">
+<thead>
+<tr>
+	<th><a href="#">{L_USERNAME}</a></th>
+	<th>{L_PF_REALNAME}</th>
+	<th>{L_JOINED}</th>
+	<th>{L_RENEWAL_DATE}</th>
+	<th>{L_LAST_VISIT}</th>
+	<th>{L_MARK}</th>
+</tr>
+</thead>
+<tbody>
+<!-- BEGIN members -->
+	<!-- IF members.S_ROW_COUNT is even --><tr class="row1"><!-- ELSE --><tr class="row2"><!-- ENDIF -->
+
+		<td style="vertical-align: top;">
+			{members.USERNAME_FULL}
+			<!-- IF members.POSTS --><br />{L_POSTS}: <strong>{members.POSTS}</strong> [<a href="{members.U_SEARCH_USER}">{L_SEARCH_USER_POSTS}</a>]<!-- ENDIF -->
+		</td>
+		<td style="vertical-align: top;">{members.PF_REALNAME}</td>
+		<td style="vertical-align: top;">{members.JOINED}</td>
+		<td style="vertical-align: top;">{members.RENEWAL_DATE}
+			<!-- IF members.REMINDED --><br />{members.REMINDED_EXPLAIN}<!-- ENDIF -->
+		</td>
+		<td style="vertical-align: top;">{members.LAST_VISIT}</td>
+		<td>&nbsp;<input type="checkbox" class="radio" name="mark[]" value="{members.USER_ID}" />&nbsp;</td>
+	</tr>
+<!-- BEGINELSE -->
+	<tr>
+		<td colspan="6" style="text-align: center;">{L_NO_CLUB_MEMBERS}</td>
+	</tr>
+<!-- END members -->
+</tbody>
+</table>
+
+<fieldset class="display-options">
+	{L_DISPLAY_MEMBERS}: &nbsp;{S_LIMIT_RECORDS}&nbsp;{L_SORT_BY}: {S_SORT_KEY} {S_SORT_DIR}<!-- IF PAGINATION -->&nbsp;Users per page: <input class="inputbox autowidth" type="text" name="users_per_page" id="users_per_page" size="3" value="{USERS_PER_PAGE}" /><!-- ENDIF -->
+	<input class="button2" type="submit" value="{L_GO}" name="sort" />
+</fieldset>
+
+<hr />
+
+<!-- IF PAGINATION -->
+	<div class="pagination">
+		<a href="#" onclick="jumpto(); return false;" title="{L_JUMP_TO_PAGE}">{S_ON_PAGE}</a> &bull; <span>{PAGINATION}</span>
+	</div>
+<!-- ENDIF -->
+
+<fieldset class="quick">
+	<select name="action">{S_MEMBERSHIP_OPTIONS}</select>
+	<input class="button2" type="submit" name="submit" value="{L_SUBMIT}" />
+	<p class="small"><a href="#" onclick="marklist('members', 'mark', true); return false;">{L_MARK_ALL}</a> &bull; <a href="#" onclick="marklist('members', 'mark', false); return false;">{L_UNMARK_ALL}</a></p>
+	{S_FORM_TOKEN}
+</fieldset>
+
+</form>
+
+<!-- INCLUDE overall_footer.html -->

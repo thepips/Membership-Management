@@ -1,0 +1,32 @@
+	<form id="user_membership" method="post" action="{U_ACTION}">
+    <!-- IF NOT_MEMBER -->
+		<div class="errorbox">
+			<p>{L_NOT_MEMBER}</p>
+		</div>
+	<!-- ELSE -->
+    	<fieldset>
+    		<legend>{L_USER_MEMBERSHIP}</legend>
+    	<dl>
+    		<dt><label for="icq">{L_MEMBERSHIP_NO}:</label><br /><span>{L_MEMBERSHIP_NO_EXPLAIN}</span></dt>
+    		<dd><input type="text" id="membership_no" name="membership_no" value="{MEMBERSHIP_NO}" /></dd>
+    	</dl>
+    	<dl>
+    		<dt><label for="associate_id">{L_ASSOCIATE_NAME}:</label><br /><span>{L_ASSOCIATE_NAME_EXPLAIN}</span></dt>
+    		<dd><input type="text" id="associate_name" name="associate_name" value="{ASSOCIATE_NAME}" /></dd>
+    	</dl>
+    	<dl> 
+    		<dt><label for="renewal_date">{L_RENEWAL}:</label><br /><span>{L_RENEWAL_EXPLAIN}</span></dt>
+    		<dd>{L_DAY}: <select id="renewal_date" name="rday_day">{S_RENEWAL_DAY_OPTIONS}</select> {L_MONTH}: <select name="rday_month">{S_RENEWAL_MONTH_OPTIONS}</select> {L_YEAR}: <select name="rday_year">{S_RENEWAL_YEAR_OPTIONS}</select></dd>
+    	</dl>
+    	<dl> 
+    		<dt><label for="datepaid">{L_DATEPAID}:</label><br /><span>{L_DATEPAID_EXPLAIN}</span></dt>
+    		<dd>{L_DAY}: <select id="datepaid" name="pday_day">{S_PAID_DAY_OPTIONS}</select> {L_MONTH}: <select name="pday_month">{S_PAID_MONTH_OPTIONS}</select> {L_YEAR}: <select name="pday_year">{S_PAID_YEAR_OPTIONS}</select></dd>
+    	</dl>
+    	</fieldset>
+    
+    	<fieldset class="quick">
+    		<input class="button1" type="submit" name="update" value="{L_SUBMIT}" />
+    		{S_FORM_TOKEN}
+    	</fieldset>
+	<!-- ENDIF -->
+	</form>

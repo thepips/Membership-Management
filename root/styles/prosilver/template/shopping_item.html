@@ -1,0 +1,56 @@
+<!-- INCLUDE overall_header.html -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<a name="maincontent"></a>
+<h1><a href="{U_SHOPPING_BASKET}">{L_ADD_TO_BASKET}</a></h1>
+
+<div class="post bg2" id="preview">
+    <div class="inner"><span class="corners-top"><span></span></span>
+        <div class="postbody">
+            <form method="post" id="membership" action="{S_ACTION}">
+            	<div class="panel bg3">
+                    <fieldset class="fields1">
+                        <!-- BEGIN subscriptions -->
+                        <!-- IF subscriptions.S_FIRST_ROW -->
+                        <dt>
+                        
+                            <label for="duration_charge">Duration Charge:</label>
+                            <br /><span>{L_PROMPT_CHOICE} </span>
+                        </dt>
+                        <!-- ENDIF -->
+                        <dd>
+                            <input type="radio" <!-- IF subscriptions.S_FIRST_ROW -->checked="checked" <!-- ENDIF -->name="rb_sub_choice" value="{subscriptions.TYPE}" />{subscriptions.MESSAGE}<br />
+                        </dd>
+                            <!-- END subscriptions -->
+                    </fieldset>
+            	</div>&nbsp;
+                <hr /><br />
+            	<div class="panel bg3">
+                    <fieldset class="fields1">
+                        <dt>
+                            <label for="subscription_choice">Payment Basis:</label><br/><span>{L_PROMPT_CHOICE}</span>
+                        </dt>
+                    	<dd>
+                            <input type="radio" name="rb_subscription" value="1" checked="checked" /> {L_SUBSCRIPTION}<br />
+                        </dd>
+                    	<dd>
+                            <input type="radio" name="rb_subscription" value="0" /> {L_ONE_OFF_PAYMENT}
+                        </dd>
+                    </fieldset>
+            	</div>&nbsp;
+                <br />
+            	<p class="submit-buttons">
+            		<input class="button" type="submit" id="checkout" name="checkout" value="{L_CHECKOUT}" />&nbsp;
+            		<input class="button" type="submit" id="continue" name="continue" value="{L_CONTINUE_SHOPPING}" />&nbsp;
+            		<input class="button" type="submit" id="backout" name="backout" value="{L_CANCEL}" />
+            	&nbsp;<br />
+            	</p>
+            {S_FORM_TOKEN}
+            </form>
+        </div>
+        <span class="corners-bottom"><span></span></span>
+    </div>
+</div>
+
+	
+<br clear="all">
+<!-- INCLUDE overall_footer.html -->

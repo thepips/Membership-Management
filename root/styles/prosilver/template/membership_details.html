@@ -1,0 +1,81 @@
+<!-- INCLUDE overall_header.html -->
+
+<!-- INCLUDE renewal.html -->
+
+<!-- IF LIST_APPLICANTS -->
+	<!-- BEGIN groups -->
+
+	<h2>{L_PENDING_APPLICATIONS}</a> {groups.GROUP_NAME}</h2>
+		<div class="forabg">
+			<div class="inner"><span class="corners-top"><span></span></span>
+		
+			<ul class="topiclist">
+				<li class="header">
+					<dl>
+						<dd class="column20pc">{L_USER_ID}</dd>
+                        <dd class="column10pc" style="width: 8%; text-align:center;">{L_RENEWAL}</dd>
+						<dd class="column30pc">{L_MS_REALNAME}/<br /> {L_MS_ADDRESS}</dd>
+						<dd class="column10pcleft" style="width: 8%; text-align:center;">{L_MS_PHONE}/<br />{L_MS_MOBILE}</dd>
+						<dd class="column10pcleft" style="width: 8%; text-align:center;">{L_MS_MAKE}/<br />{L_MS_REG}</dd>
+						<dd class="column10pc" style="width: 8%; text-align:center;">{L_MARK_PAID}</dd>
+						<dd class="column10pc" style="width: 8%; text-align:center;">{L_MARK_APPROVED}</dd>
+						<dd class="column10pc" style="width: 8%; text-align:center;">{L_MARK_REJECTED}</dd>
+						</dl>
+					</dl>
+				</li>
+			</ul>
+			<ul class="topiclist forums">
+				<!-- IF S_NO_APPLICANTS -->
+					<div class="panel">
+					<div class="inner"><span class="corners-top"><span></span></span>
+					<strong>{L_N0_APPLICANTS}</strong>
+					</div>
+				<!-- ELSE -->			
+					<!-- BEGIN applicants -->
+					<li class="row">
+						<dl>
+							<dd class="column20pc">
+								{applicants.ID}<br />
+								{applicants.USERNAME}
+							</dd>
+							<dd class="column10pc" style="width: 8%; text-align:center;">
+                                {applicants.RENEWAL_DATE}
+							</dd>
+							<dd class="column30pc">{applicants.MS_REALNAME}<br />{applicants.MS_ADDRESS}<br />{applicants.MS_POSTCODE}</dd>
+							<dd class="column10pcleft" style="width: 8%; text-align:center;">{applicants.MS_PHONE}<br />{applicants.MS_MOBILE}</dd>
+							<dd class="column10pcleft" style="width: 8%; text-align:center;">{applicants.MS_DETAILS} {applicants.MS_VEHICLE}</dd>
+							<dd class="column10pc" style="width: 8%; text-align:center;">
+							<!-- IF ! APPROVE_PAYMENT -->
+								<img src="{T_IMAGES_PATH}pound_grey.gif" alt="Not Allowed"/></a>
+							<!-- ELSEIF applicants.NOT_PAID_YET -->
+								<a href="{applicants.PAID}" ><img src="{T_IMAGES_PATH}pound.gif" alt="Mark Paid"/></a>
+							<!-- ELSE  -->			
+								<img src="{T_IMAGES_PATH}pound_slash.gif" alt="Already paid"/></a>
+							<!-- ENDIF -->
+							</dd>
+							<dd class="column10pc" style="width: 8%; text-align:center;">
+							<!-- IF applicants.APPLYING -->
+								<a href="{applicants.APPROVE}" ><img src="{T_IMAGES_PATH}tick.gif" alt="Approve"/></a>
+							<!-- ELSE -->
+								<img src="{T_IMAGES_PATH}tick_grey.gif" alt="Member Renewing"/></a>
+							<!-- ENDIF -->
+							</dd>
+							<dd class="column10pc" style="width: 8%; text-align:center;">
+							<!-- IF applicants.APPLYING -->
+								<a href="{applicants.REJECT}"><img src="{T_IMAGES_PATH}cross.gif" alt="Reject"/></a>
+							<!-- ELSE -->
+								<img src="{T_IMAGES_PATH}cross_grey.gif" alt="Member Renewing"/></a>
+							<!-- ENDIF -->
+							</dd>
+						</dl>
+					</li>
+					<!-- END applicants -->
+				<!-- ENDIF -->
+			</ul>
+		
+			<span class="corners-bottom"><span></span></span></div>
+		</div>
+	<!-- END groups -->
+<!-- ENDIF -->
+<br />
+<!-- INCLUDE overall_footer.html -->
