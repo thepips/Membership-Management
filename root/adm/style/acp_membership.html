@@ -66,6 +66,8 @@ Click <a href="{U_GENERATION}">Here</a> to run membership reports
 <!-- ENDIF -->
 
 <fieldset class="quick">
+    Set date: </label>{L_DAY}: <select id="renewal_date" name="rday_day">{S_RENEWAL_DAY_OPTIONS}</select> {L_MONTH}: <select name="rday_month">{S_RENEWAL_MONTH_OPTIONS}</select> {L_YEAR}: <select name="rday_year">{S_RENEWAL_YEAR_OPTIONS}</select>
+    	
 	<select name="action">{S_MEMBERSHIP_OPTIONS}</select>
 	<input class="button2" type="submit" name="submit" value="{L_SUBMIT}" />
 	<p class="small"><a href="#" onclick="marklist('members', 'mark', true); return false;">{L_MARK_ALL}</a> &bull; <a href="#" onclick="marklist('members', 'mark', false); return false;">{L_UNMARK_ALL}</a></p>

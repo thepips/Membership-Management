@@ -19,7 +19,7 @@ Payment can be made by Cheque, EFT and Paypal using Express Checkout backed up w
         <email><![CDATA[doug@arvclub.co.uk]]></email>
       </author>
     </author-group>
-    <mod-version>0.0.10 Alpha</mod-version>
+    <mod-version>0.0.13 Alpha</mod-version>
     <installation>
       <level>intermediate</level>
       <time>1800</time>
@@ -34,7 +34,8 @@ Payment can be made by Cheque, EFT and Paypal using Express Checkout backed up w
       <file from="root/generate_mailing_list.php" to="generate_mailing_list.php" />
       <file from="root/shopping.php" to="shopping.php" />
       <file from="root/adm/style/acp_membership.html" to="adm/style/acp_membership.html" />
-      <file from="root/images/ExtendPP1.gif" to="images/ExtendPP1.gif" />
+      <file from="root/adm/style/acp_users_membership.html" to="adm/style/acp_users_membership.html" />
+      <file from="root/images/ExtendPP1.gif" to="images/ExtendPP1.gif"></file>
       <file from="root/images/btn_buynowCC_LG.gif" to="images/btn_buynowCC_LG.gif" />
       <file from="root/images/btn_subscribeCC_LG.gif" to="images/btn_subscribeCC_LG.gif" />
       <file from="root/images/cancel_sub.png" to="images/cancel_sub.png" />
@@ -53,7 +54,6 @@ Payment can be made by Cheque, EFT and Paypal using Express Checkout backed up w
       <file from="root/images/tick_grey.gif" to="images/tick_grey.gif" />
       <file from="root/images/x-click-butcc-subscribe.gif" to="images/x-click-butcc-subscribe.gif" />
       <file from="root/includes/cheque_class.php" to="includes/cheque_class.php" />
-      <file from="root/includes/class_application.php" to="includes/class_application.php" />
       <file from="root/includes/cron_membership.php" to="includes/cron_membership.php" />
       <file from="root/includes/eft_class.php" to="includes/eft_class.php" />
       <file from="root/includes/functions_membership.php" to="includes/functions_membership.php" />
@@ -63,7 +63,8 @@ Payment can be made by Cheque, EFT and Paypal using Express Checkout backed up w
       <file from="root/includes/paypal_class.php" to="includes/paypal_class.php" />
       <file from="root/includes/acp/acp_membership.php" to="includes/acp/acp_membership.php" />
       <file from="root/includes/acp/acp_payments.php" to="includes/acp/acp_payments.php" />
-      <file from="root/includes/acp/info/acp_membership.php" to="includes/acp/info/acp_membership.php" />
+      <file from="root/includes/acp/acp_users_membership.php" to="includes/acp/acp_users_membership.php" />
+      <file from="root/includes/acp/info/acp_membership.php" to="includes/acp/info/acp_membership.php"></file>
       <file from="root/includes/acp/info/acp_payments.php" to="includes/acp/info/acp_payments.php" />
       <file from="root/language/en/mods/application.php" to="language/en/mods/application.php" />
       <file from="root/language/en/mods/info_acp_membership.php" to="language/en/mods/info_acp_membership.php" />
@@ -116,9 +117,7 @@ Payment can be made by Cheque, EFT and Paypal using Express Checkout backed up w
     </open>
     <open src="adm/style/acp_users.html">
       <edit>
-        <find><![CDATA[<!-- ENDIF -->
-
-<!-- INCLUDE overall_footer.html -->]]></find>
+        <find><![CDATA[<!-- INCLUDE acp_users_warnings.html -->]]></find>
         <action type="before-add"><![CDATA[<!-- ELSEIF S_USERS_MEMBERSHIP -->
     <!-- INCLUDE acp_users_membership.html -->
 ]]></action>
@@ -180,6 +179,46 @@ function get_config($config_id)
 ]]></action>
       </edit>
     </open>
+    <open src="includes/acp/acp_users.php">
+      <edit>
+        <find><![CDATA[			case 'overview':]]></find>
+        <action type="before-add"><![CDATA[            case 'users_membership':
+				include($phpbb_root_path . 'includes/acp/acp_users_membership.' . $phpEx);
+                break;
+                ]]></action>
+      </edit>
+    </open>
+    <open src="includes/ucp/ucp_register.php">
+      <edit>
+        <find><![CDATA[			return;
+		}
+		]]></find>
+        <action type="after-add"><![CDATA[		$choice_enabled = (!empty($config['ms_enable_membership'])
+			 && !(($coppa || $config['require_activation'] == USER_ACTIVATION_SELF || $config['require_activation'] == USER_ACTIVATION_ADMIN) && $config['email_enable']));
+]]></action>
+      </edit>
+      <edit>
+        <find><![CDATA[			'tz'				=> request_var('tz', (float) $timezone),]]></find>
+        <action type="after-add"><![CDATA[			'premium_membership'=> request_var('premium_membership',0),]]></action>
+      </edit>
+      <edit>
+        <find><![CDATA[				$message = $message . '<br /><br />' . sprintf($user->lang['RETURN_INDEX'], '<a href="' . append_sid("{$phpbb_root_path}index.$phpEx") . '">', '</a>');]]></find>
+        <action type="replace-with"><![CDATA[				if ($choice_enabled && $data['premium_membership'])
+				{
+					$message = $message . '<br /><br />' . sprintf($user->lang['CONTINUE_APPLICATION'], '<a href="' . append_sid("{$phpbb_root_path}application.$phpEx","mode=apply&result=index&member=1&r=1&i={$user_id}&g={$config['ms_subscription_group']}") . '">', '</a>');
+				}
+				else
+				{
+					$message = $message . '<br /><br />' . sprintf($user->lang['RETURN_INDEX'], '<a href="' . append_sid("{$phpbb_root_path}index.$phpEx") . '">', '</a>');
+				}
+]]></action>
+      </edit>
+      <edit>
+        <find><![CDATA[			'S_UCP_ACTION'		=> append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=register'),]]></find>
+        <action type="after-add"><![CDATA[			'CHOICE_ENABLED'	=> !empty($choice_enabled),
+			'PREMIUM_MEMBERSHIP'=> $data['premium_membership'],]]></action>
+      </edit>
+    </open>
     <open src="language/en/common.php">
       <edit>
         <find><![CDATA[	'AND'							=> 'And',]]></find>
@@ -189,10 +228,21 @@ function get_config($config_id)
       <edit>
         <find><![CDATA[	'MEMBERLIST_EXPLAIN'	=> 'View complete list of members',]]></find>
         <action type="after-add"><![CDATA[	'MEMBERSHIP'            => 'Membership',
-	'MEMBERSHIP_EXPLAIN'    => 'Membership status',]]></action>
+	'MEMBERSHIP_EXPLAIN'    => 'Membership status',    	'CONTINUE_APPLICATION'          => '%sContinue with Application%s',
+	'MEMBERSHIP_TYPE'				=> 'Standard or Premium Account',
+	'PREMIUM_MEMBERSHIP'			=> 'Premium Membership',
+   	'PREMIUM_MEMBERSHIP_EXPLAIN'	=> 'Premium membership gives a number of priveledges for a very reasonable sum. Membership gives you access to additional areas and features not available to standard members.',
+	'STANDARD_MEMBERSHIP'			=> 'Standard Membership',
+    'STANDARD_MEMBERSHIP_EXPLAIN'	=> 'Some areas of the forum are restricted to premium members. There is no charge for standard membership and you can upgrade to premium membership at any time.',
+]]></action>
       </edit>
     </open>
     <open src="language/en/acp/common.php">
+      <edit>
+        <find><![CDATA[	'ACP_USER_GROUPS'				=> 'Groups',]]></find>
+        <action type="after-add">	'ACP_USER_MANAGEMENT'			=&gt; 'User management',	'ACP_USER_USERS_MEMBERSHIP'			=&gt; 'Club membership',
+</action>
+      </edit>
       <edit>
         <find><![CDATA[	'LOG_WORD_EDIT'			=> '<strong>Edited word censor</strong><br />» %s',]]></find>
         <action type="after-add"><![CDATA[    
@@ -234,6 +284,23 @@ function get_config($config_id)
           <inline-find><![CDATA[<!-- ENDIF -->]]></inline-find>
           <inline-action type="before-add"><![CDATA[<li class="icon-members"><a href="{U_MEMBERSHIP}" title="{L_MEMBERSHIP_EXPLAIN}">{L_MEMBERSHIP}</a></li>]]></inline-action>
         </inline-edit>
+      </edit>
+    </open>
+    <open src="styles/prosilver/template/ucp_register.html">
+      <edit>
+        <find><![CDATA[	<!-- END profile_fields -->
+	<!-- ENDIF -->]]></find>
+        <action type="after-add"><![CDATA[	<!-- IF CHOICE_ENABLED -->
+		<hr />
+		<dl>
+			<dt><label for="premium_membership">{L_MEMBERSHIP_TYPE}:</label><br/></dt>
+			<dd><input type="radio" name="premium_membership" value="0" checked="checked" /> {L_STANDARD_MEMBERSHIP}<br /></dd>
+			<!-- IF L_STANDARD_MEMBERSHIP_EXPLAIN --><span>{L_STANDARD_MEMBERSHIP_EXPLAIN}</span><br /><!-- ENDIF -->
+			<dd><input type="radio" name="premium_membership" value="1" /> {L_PREMIUM_MEMBERSHIP}</dd>
+			<!-- IF L_PREMIUM_MEMBERSHIP_EXPLAIN --><span>{L_PREMIUM_MEMBERSHIP_EXPLAIN}</span><br /><!-- ENDIF -->
+		</dl>
+	<!-- ENDIF -->
+]]></action>
       </edit>
     </open>
     <php-installer><![CDATA[createMembership.php]]></php-installer>

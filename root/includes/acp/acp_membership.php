@@ -31,7 +31,8 @@ class acp_membership
 		global $config, $phpbb_root_path, $phpbb_admin_path, $phpEx;
 		global $cache;
 
-		$user->add_lang('acp/board');
+		$user->add_lang(array('acp/board', 'acp/users'));
+		include($phpbb_root_path . 'includes/functions_user.' . $phpEx);
 		include($phpbb_root_path . 'includes/functions_membership.' . $phpEx);
 
 		$action	= request_var('action', '');
@@ -55,7 +56,8 @@ class acp_membership
 					'vars'	=> array(
 						'legend1'                     => 'SUBSCRIPTION_SETTINGS_TITLE',
 						'ms_enable_membership'		=> array('lang' => 'ENABLE_MEMBERSHIP', 'validate' => 'bool', 'type' => 'radio:yes_no',	'explain' => true),
-						'ms_subscription_group'		=> array('lang' => 'SUBSCRIPTION_GROUP', 'validate' => 'int', 'type' => 'select:10:0', 'method' => 'subscription_group', 'explain' => true),
+						'ms_subscription_group'		=> array('lang' => 'SUBSCRIPTION_GROUP', 'validate' => 'int', 'type' => 'select', 'method' => 'subscription_group', 'explain' => true),
+						'ms_rank'                     => array('lang' => 'RANK', 'validate' => 'int', 'type' => 'select', 'method' => 'rank', 'explain' => true),
 						'ms_subscription_extra_days'=> array('lang' => 'SUBSCRIPTION_EXTRA_DAYS', 		'validate' => 'int',	'type' => 'text:4:4',	'explain' => true),
 						'ms_process_on_payment'		=> array('lang' => 'PROCESS_ON_PAYMENT', 'validate' => 'bool', 'type' => 'radio:yes_no',	'explain' => true),
 						'ms_approval_required'		=> array('lang' => 'APPROVAL_REQUIRED', 'validate' => 'bool', 'type' => 'radio:yes_no',	'explain' => true),
@@ -64,7 +66,7 @@ class acp_membership
 						'ms_overdue_period'			=> array('lang' => 'OVERDUE_PERIOD', 'validate' => 'int',	'type' => 'custom',	'method' => 'time_interval', 'explain' => true),
 						'ms_last_chance_period'		=> array('lang' => 'LAST_CHANCE_PERIOD', 'validate' => 'int',	'type' => 'custom',	'method' => 'time_interval', 'explain' => true),
 						'ms_grace_period'			=> array('lang' => 'GRACE_PERIOD', 'validate' => 'int',	'type' => 'custom',	'method' => 'time_interval', 'explain' => true),
-						'ms_application_forum'		=> array('lang' => 'APPLICATION_FORUM', 'validate' => 'int',	'type' => 'select:10:0', 'method' => 'application_forum', 'explain' => true),
+						'ms_application_forum'		=> array('lang' => 'APPLICATION_FORUM', 'validate' => 'int',	'type' => 'select', 'method' => 'application_forum', 'explain' => true),
 						'ms_allow_associate'        => array('lang' => 'ALLOW_ASSOCIATES', 'validate' => 'bool', 'type' => 'radio:yes_no',	'explain' => true),
 						'legend2'					=> 'SUBSCRIPTION_CHARGES_SETTINGS',
                         'ms_period_start'           => array('lang' => 'PERIOD_START', 'validate' => 'num', 'type' => 'text:10:20',	'explain' => true),
@@ -183,7 +185,7 @@ class acp_membership
     				{
     					continue;
     				}
-    	
+
     				$template->assign_block_vars('options', array(
     					'KEY'			=> $config_key,
     					'TITLE'			=> (isset($user->lang[$vars['lang']])) ? $user->lang[$vars['lang']] : $vars['lang'],
@@ -198,6 +200,11 @@ class acp_membership
 			break;
 
 			case 'list':
+				$renewal_date=strtotime('+ 3 month');
+				$data['rday_day']           = request_var('rday_day', date('j', $renewal_date));
+				$data['rday_month']         = request_var('rday_month', date('n', $renewal_date));
+				$data['rday_year']          = request_var('rday_year', date('Y', $renewal_date));
+
 				$sql = 'SELECT  group_name FROM ' . GROUPS_TABLE . ' WHERE group_id = "' . $config['ms_subscription_group'] . '"';
 				$result = $db->sql_query($sql);
 				$group_name = $db->sql_fetchfield('group_name');
@@ -229,11 +236,11 @@ class acp_membership
                 
                 $where = array(
 					// All Members
-					(" AND u.group_id='{$config['ms_subscription_group']}'"),
+					(" AND m.group_id='{$config['ms_subscription_group']}'"),
 					// Overdue i.e. renewal_date is before today
-					(" AND u.group_id='{$config['ms_subscription_group']}' AND m.remindertype='3'"),
+					(" AND m.group_id='{$config['ms_subscription_group']}' AND m.remindertype='3'"),
 					// Due this period i.e. due soon
-					(" AND u.group_id='{$config['ms_subscription_group']}' AND m.remindertype='2'"),
+					(" AND m.group_id='{$config['ms_subscription_group']}' AND m.remindertype='2'"),
 					//Due next period i.e. due on date
 					(" AND m.group_id='{$config['ms_subscription_group']}' AND m.remindertype='1'"),
 					//Missing Renewal Date
@@ -252,215 +259,255 @@ class acp_membership
 		
 				if ($submit && sizeof($mark))
 				{
+					$error = validate_data($data, array(
+						'rday_day'		=> array('num', true, 1, 31),
+						'rday_month'	=> array('num', true, 1, 12),
+						'rday_year'		=> array('num', true, 1901, strtotime('+ 10 years')),
+					));
+					if (checkdate($data['rday_month'],$data['rday_day'],$data['rday_year']))
+					{
+						$renewal_date =    mktime(0,0,0,$data['rday_month'],$data['rday_day'],$data['rday_year']);
+					}
+					else
+					{
+						$error[] = 'INVALID_DATE';            
+					}
+				
 		//			if ($action !== 'remove' && !check_form_key($form_key))
 		//			{
 		//				trigger_error($user->lang['FORM_INVALID'] . adm_back_link($this->u_action), E_USER_WARNING);
 		//			}
-					switch ($action)
+					if (!sizeof($error))
 					{
-						case 'renew':
-							// Get those 'being renewed'...
-							if (confirm_box(true))
-							{
-                                $sql_array = array(
-                                	'SELECT'    => 'u.user_id, username, renewal_date',
-                                	'FROM'      => array(
-                                		USERS_TABLE=> 'u',
-                                	),
-                                	'LEFT_JOIN' => array(
-                                		array(
-                                			'FROM'  => array(MEMBERSHIP_TABLE => 'm'),
-                                			'ON'    => ('m.user_id = u.user_id AND m.group_id=' . $config['ms_subscription_group']),
-                                		),
-                                	),
-                                	'WHERE'     	=> 'u.' . $db->sql_in_set('user_id', $mark),
-                                );
-                                $sql=$db->sql_build_query('SELECT', $sql_array);
+						switch ($action)
+						{
+							case 'join':
+							case 'renew':
+								// Get those 'being renewed'...
+								if (confirm_box(true))
+								{
+									$sql_array = array(
+										'SELECT'    => 'u.user_id, username, renewal_date',
+										'FROM'      => array(
+											USERS_TABLE=> 'u',
+										),
+										'LEFT_JOIN' => array(
+											array(
+												'FROM'  => array(MEMBERSHIP_TABLE => 'm'),
+												'ON'    => ('m.user_id = u.user_id AND m.group_id=' . $config['ms_subscription_group']),
+											),
+										),
+										'WHERE'     	=> 'u.' . $db->sql_in_set('user_id', $mark),
+									);
+									$sql=$db->sql_build_query('SELECT', $sql_array);
+
+									$result = $db->sql_query($sql);
+				
+									$user_marked = array();
+									while ($row = $db->sql_fetchrow($result))
+									{
+										$user_marked[] = $row;
+									}
+									$db->sql_freeresult($result);
+
+									$sql_ary = array(
+										'remindercount'     => '0', 
+										'reminderdate'      => '0',
+										'remindertype'      => '0',
+										'renewal_date'      => $renewal_date,
+									);
+
+									foreach ($user_marked as $user_selected)
+									{
+										update_membership($config['ms_subscription_group'], $user_selected['user_id'], $sql_ary);
+
+										if ($action=='join')
+										{
+											group_user_add($config['ms_subscription_group'],$user_selected['user_id'], false, false,0,$config['ms_approval_required']);
+										}
+										ELSE										
+										{
+											add_log('admin', 'LOG_USER_GROUP_RENEWED', $user_selected['username'], $group_name);
+										}
+									}
+								}
+								else
+								{
+									$s_hidden_fields = array(
+										'mode'			=> $mode,
+										'action'		=> $action,
+										'mark'			=> $mark,
+										'submit'		=> 1,
+										'start'			=> $start,
+									);
+									confirm_box(false, $user->lang['RENEWAL_CONFIRMATION'], build_hidden_fields($s_hidden_fields));
+			
+								}
+								// For activate we really need to redirect, else a refresh can result in users being deactivated again
+			
+								$u_action = $this->u_action . "&amp;$u_sort_param&amp;start=$start";
+								$u_action .= ($per_page != $config['topics_per_page']) ? "&amp;users_per_page=$per_page" : '';
+			
+								redirect($u_action);
+								break;
+								
+							case 'remove':
+			
+								if (confirm_box(true))
+								{
+    								$sql = 'SELECT user_id
+    									FROM ' . USERS_TABLE . '
+    									WHERE ' . $db->sql_in_set('user_id', $mark);
+    								$result = $db->sql_query($sql);
+    								
+	       							while ($row = $db->sql_fetchrow($result))
+                                    {
+                                        $userids[]  = $db->sql_fetchfield('user_id');
+                                    }
+    								$db->sql_freeresult($result);
+                                    foreach($userids as $user_selected)
+                                    {
+								        remove_member($config['ms_subscription_group'], $user_selected);
+                                    }
+								}
+								else
+								{
+									$s_hidden_fields = array(
+										'mode'			=> $mode,
+										'action'		=> $action,
+										'mark'			=> $mark,
+										'submit'		=> 1,
+										'start'			=> $start,
+									);
+									confirm_box(false, $user->lang['CONFIRM_OPERATION'], build_hidden_fields($s_hidden_fields));
+								}
+			
+							break;
+			
+							case 'remind':
+								if (empty($config['email_enable']))
+								{
+									trigger_error($user->lang['EMAIL_DISABLED'] . adm_back_link($this->u_action), E_USER_WARNING);
+								}
+								$sql_array = array(
+									'SELECT'    => 'u.user_id, username, user_email, user_lang, user_jabber, user_notify_type, user_regdate, user_actkey, pfd.pf_ms_realname, remindercount, renewal_date',
+									'FROM'      => array(
+										USERS_TABLE=> 'u',
+									),
+									'LEFT_JOIN' => array(
+										array(
+											'FROM'  => array(MEMBERSHIP_TABLE => 'm'),
+											'ON'    => ('m.user_id = u.user_id AND m.group_id=' . $config['ms_subscription_group']),
+										),
+										array(
+											'FROM'  => array(PROFILE_FIELDS_DATA_TABLE => 'pfd'),
+											'ON'    => ('pfd.user_id = u.user_id'),
+										),
+									),
+									'WHERE'     	=> 'u.' . $db->sql_in_set('user_id', $mark),
+								);
+								$sql=$db->sql_build_query('SELECT', $sql_array);
 
 								$result = $db->sql_query($sql);
 			
-								$user_affected = array();
-								while ($row = $db->sql_fetchrow($result))
+								if ($row = $db->sql_fetchrow($result))
 								{
-									$user_affected[] = $row;
+									// Send the messages
+									include_once($phpbb_root_path . 'includes/functions_messenger.' . $phpEx);
+			
+									$messenger = new messenger();
+									$usernames = $user_ids = array();
+			
+									do
+									{
+										$messenger->template('user_remind_inactive', $row['user_lang']);
+			
+										$messenger->to($row['user_email'], $row['username']);
+										$messenger->im($row['user_jabber'], $row['username']);
+			
+										$messenger->headers('X-AntiAbuse: Board servername - ' . $config['server_name']);
+										$messenger->headers('X-AntiAbuse: User_id - ' . $user->data['user_id']);
+										$messenger->headers('X-AntiAbuse: Username - ' . $user->data['username']);
+										$messenger->headers('X-AntiAbuse: User IP - ' . $user->ip);
+			
+										$messenger->assign_vars(array(
+											'USERNAME'		=> htmlspecialchars_decode($row['username']),
+											'REGISTER_DATE'	=> $user->format_date($row['user_regdate'], false, true),
+											'U_ACTIVATE'	=> generate_board_url() . "/ucp.$phpEx?mode=activate&u=" . $row['user_id'] . '&k=' . $row['user_actkey'])
+										);
+			
+										$messenger->send($row['user_notify_type']);
+			
+										$usernames[] = $row['username'];
+										$user_ids[] = (int) $row['user_id'];
+									}
+									while ($row = $db->sql_fetchrow($result));
+			
+									$messenger->save_queue();
+			
+									// Add the remind state to the database
+								    $sql_ary = array(
+                                        'reminderdate' => time(),
+                                        'remindercount'=> 'remindercount + 1',
+                                        );
+			
+									foreach($user_ids as $user_id)
+									{
+                                        update_membership($config['ms_subscription_group'], $user_id, $sql_ary);
+									}
+									$result = $db->sql_query($sql);
+
+                                    $sql = 'UPDATE ' . MEMBERSHIP_TABLE . ' SET remindercount=remindercount+1 
+                                        WHERE ' . $db->sql_in_set('user_id', $user_ids) . "
+                                        AND group_id = $group_id";
+                                    $db->sql_query($sql);        
+			
+									add_log('admin', 'LOG_MEMBERSHIP_DUE_REMIND', implode(', ', $usernames));
+									unset($usernames);
 								}
 								$db->sql_freeresult($result);
-
-								foreach ($user_affected as $user_marked)
-								{
-			// Calculate renewal date
-                                    $renewal_date = calc_date($config['ms_billing_cycle'], $config['ms_billing_cycle_basis'], $user_marked['renewal_date']);
-                                    set_renewal_date($config['ms_subscription_group'], $user_marked['user_id'], $renewal_date);
-
-									$sql = 'SELECT count(user_id) AS user_count FROM ' . MEMBERSHIP_TABLE . ' WHERE group_id = ' . $config['ms_subscription_group'] . ' and user_id = ' . $user_marked['user_id'];
-									$result = $db->sql_query($sql);
-									$user_count = (int) $db->sql_fetchfield('user_count');
-									$db->sql_freeresult($result);
-									if ($user_count)
-									{
-										add_log('admin', 'LOG_USER_GROUP_RENEWED', $user_marked['username'], $group_name);
-									}
-									ELSE										
-									{
-										group_user_add($config['ms_subscription_group'],$user_marked['user_id'], false, false,0,$config['ms_approval_required']);
-										add_log('admin', 'LOG_USER_GROUP_JOINED', $user_marked['username'],$group_name);
-									}
-								}
-							}
-							else
-							{
-								$s_hidden_fields = array(
-									'mode'			=> $mode,
-									'action'		=> $action,
-									'mark'			=> $mark,
-									'submit'		=> 1,
-									'start'			=> $start,
-								);
-								confirm_box(false, sprintf($user->lang['RENEWAL_CONFIRMATION'], $config['ms_billing_cycle'], $config['ms_billing_cycle_basis']), build_hidden_fields($s_hidden_fields));
-		
-							}
-							// For activate we really need to redirect, else a refresh can result in users being deactivated again
-		
-							$u_action = $this->u_action . "&amp;$u_sort_param&amp;start=$start";
-							$u_action .= ($per_page != $config['topics_per_page']) ? "&amp;users_per_page=$per_page" : '';
-		
-							redirect($u_action);
+			
+								// For remind we really need to redirect, else a refresh can result in more than one reminder
+								$u_action = $this->u_action . "&amp;$u_sort_param&amp;start=$start";
+								$u_action .= ($per_page != $config['topics_per_page']) ? "&amp;users_per_page=$per_page" : '';
+			
+								redirect($u_action);
+			
 							break;
-							
-						case 'remove':
-		
-							$sql = 'SELECT user_id, username
-								FROM ' . USERS_TABLE . '
-								WHERE ' . $db->sql_in_set('user_id', $mark);
-							$result = $db->sql_query($sql);
-							
-							$usernames = $user_ids = array();
-							
-							while ($row = $db->sql_fetchrow($result))
-							{
-								$usernames[] = $row['username'];
-								$user_ids[] = (int) $row['user_id'];
-							}
-							$db->sql_freeresult($result);
-							
-							if (confirm_box(true))
-							{
-								$sql = 'DELETE FROM ' . USER_GROUP_TABLE . ' WHERE ' . USER_GROUP_TABLE . '.group_id = ' . $config['ms_subscription_group'] . ' AND ' . USER_GROUP_TABLE . '.user_id IN (' . implode(', ', $user_ids) . ')';
-								$result = $db->sql_query($sql);
-								$sql = 'UPDATE ' . MEMBERSHIP_TABLE . ' SET reminderdate = 0 WHERE user_id IN (' . implode(', ', $user_ids) . ')';
-								$result = $db->sql_query($sql);
-								add_log('admin', 'LOG_GROUP_REMOVE', implode(', ',$usernames),$group_name);
-							}
-							else
-							{
-								$s_hidden_fields = array(
-									'mode'			=> $mode,
-									'action'		=> $action,
-									'mark'			=> $mark,
-									'submit'		=> 1,
-									'start'			=> $start,
-								);
-								confirm_box(false, $user->lang['CONFIRM_OPERATION'], build_hidden_fields($s_hidden_fields));
-							}
-		
-						break;
-		
-						case 'remind':
-							if (empty($config['email_enable']))
-							{
-								trigger_error($user->lang['EMAIL_DISABLED'] . adm_back_link($this->u_action), E_USER_WARNING);
-							}
-                            $sql_array = array(
-                            	'SELECT'    => 'u.user_id, username, user_email, user_lang, user_jabber, user_notify_type, user_regdate, user_actkey, realname, remindercount, renewal_date',
-                            	'FROM'      => array(
-                            		USERS_TABLE=> 'u',
-                            	),
-                            	'LEFT_JOIN' => array(
-                            		array(
-                            			'FROM'  => array(MEMBERSHIP_TABLE => 'm'),
-                            			'ON'    => ('m.user_id = u.user_id AND m.group_id=' . $config['ms_subscription_group']),
-                            		),
-                            		array(
-                            			'FROM'  => array(PROFILE_FIELDS_DATA_TABLE => 'pfd'),
-                            			'ON'    => ('pfd.user_id = u.user_id'),
-                            		),
-                            	),
-                            	'WHERE'     	=> 'u.' . $db->sql_in_set('user_id', $mark),
-                            );
-                            $sql=$db->sql_build_query('SELECT', $sql_array);
-
-							$result = $db->sql_query($sql);
-		
-							if ($row = $db->sql_fetchrow($result))
-							{
-								// Send the messages
-								include_once($phpbb_root_path . 'includes/functions_messenger.' . $phpEx);
-		
-								$messenger = new messenger();
-								$usernames = $user_ids = array();
-		
-								do
-								{
-									$messenger->template('user_remind_inactive', $row['user_lang']);
-		
-									$messenger->to($row['user_email'], $row['username']);
-									$messenger->im($row['user_jabber'], $row['username']);
-		
-									$messenger->headers('X-AntiAbuse: Board servername - ' . $config['server_name']);
-									$messenger->headers('X-AntiAbuse: User_id - ' . $user->data['user_id']);
-									$messenger->headers('X-AntiAbuse: Username - ' . $user->data['username']);
-									$messenger->headers('X-AntiAbuse: User IP - ' . $user->ip);
-		
-									$messenger->assign_vars(array(
-										'USERNAME'		=> htmlspecialchars_decode($row['username']),
-										'REGISTER_DATE'	=> $user->format_date($row['user_regdate'], false, true),
-										'U_ACTIVATE'	=> generate_board_url() . "/ucp.$phpEx?mode=activate&u=" . $row['user_id'] . '&k=' . $row['user_actkey'])
-									);
-		
-									$messenger->send($row['user_notify_type']);
-		
-									$usernames[] = $row['username'];
-									$user_ids[] = (int) $row['user_id'];
-								}
-								while ($row = $db->sql_fetchrow($result));
-		
-								$messenger->save_queue();
-		
-								// Add the remind state to the database
-		
-								foreach ($user_ids as $user_id)
-								{
-									$sql = 'UPDATE ' . MEMBERSHIP_TABLE . 
-									' SET remindercount = remindercount + 1, reminderdate = ' . time() . ' WHERE user_id=' . $user_id;
-									$result = $db->sql_query($sql);
-									$affected_rows =$db->sql_affectedrows();
-									if ($affected_rows == 0)
-									{
-										$db->sql_query('INSERT ' . MEMBERSHIP_TABLE . ' ' . $db->sql_build_array('INSERT', array(
-										'group_id'        => $group_id,
-                                        'user_id'			=> $user_id,
-										'remindercount'	=> 1,
-										'reminderdate'	=> time())));
-									}
-								}
-								$result = $db->sql_query($sql);
-								
-		
-								add_log('admin', 'LOG_MEMBERSHIP_DUE_REMIND', implode(', ', $usernames));
-								unset($usernames);
-							}
-							$db->sql_freeresult($result);
-		
-							// For remind we really need to redirect, else a refresh can result in more than one reminder
-							$u_action = $this->u_action . "&amp;$u_sort_param&amp;start=$start";
-							$u_action .= ($per_page != $config['topics_per_page']) ? "&amp;users_per_page=$per_page" : '';
-		
-							redirect($u_action);
-		
-						break;
+						}
+					}
+					else
+					{
+						// Replace "error" strings with their real, localised form
+						$error = preg_replace('#^([A-Z_]+)$#e', "(!empty(\$user->lang['\\1'])) ? \$user->lang['\\1'] : '\\1'", $error);
 					}
 				}
-		
+
+				$s_renewal_day_options = '<option value="0"' . ((!$data['rday_day']) ? ' selected="selected"' : '') . '>--</option>';
+				for ($i = 1; $i < 32; $i++)
+				{
+					$selected = ($i == $data['rday_day']) ? ' selected="selected"' : '';
+					$s_renewal_day_options .= "<option value=\"$i\"$selected>$i</option>";
+				}
+
+				$s_renewal_month_options = '<option value="0"' . ((!$data['rday_month']) ? ' selected="selected"' : '') . '>--</option>';
+				for ($i = 1; $i < 13; $i++)
+				{
+					$selected = ($i == $data['rday_month']) ? ' selected="selected"' : '';
+					$s_renewal_month_options .= "<option value=\"$i\"$selected>$i</option>";
+				}
+				$s_renewal_year_options = '';
+				$s_paid_year_options = '';
+				$now = getdate();
+				$s_renewal_year_options = '<option value="0"' . ((!$data['rday_year']) ? ' selected="selected"' : '') . '>--</option>';
+				for ($i = $now['year']; $i <= $now['year']+20; $i++)
+				{
+					$selected = ($i == $data['rday_year']) ? ' selected="selected"' : '';
+					$s_renewal_year_options .= "<option value=\"$i\"$selected>$i</option>";
+				}
+				unset($now);
+
+				
 				// Define where and sort sql for use in displaying logs
 				
 				$sql_where = $where[$limit_records_to];
@@ -495,15 +542,24 @@ class acp_membership
 						'U_SEARCH_USER'		=> ($auth->acl_get('u_search')) ? append_sid("{$phpbb_root_path}search.$phpEx", "author_id={$row['user_id']}&amp;sr=posts") : '',
 					));
 				}
-		
-				$option_ary = array('renew' => 'RENEW', 'remove' => 'REMOVE');
-				if ($config['email_enable'])
-				{
-					$option_ary += array('remind' => 'REMIND');
-				}
+
+				if ($limit_records_to==5)
+                {
+                    $option_ary=array('join'=>'RENEW');
+                }
+                else
+                {
+    				$option_ary = array('renew' => 'RENEW', 'remove' => 'REMOVE');
+    				if ($config['email_enable'])
+    				{
+    					$option_ary += array('remind' => 'REMIND');
+    				}
+                }
 				$template->assign_vars(array(
 					'S_MEMBERSHIP_OPTIONS'	=> build_select($option_ary),
-		
+                    'S_RENEWAL_DAY_OPTIONS'  => $s_renewal_day_options,	
+                    'S_RENEWAL_MONTH_OPTIONS'  => $s_renewal_month_options,	
+                    'S_RENEWAL_YEAR_OPTIONS'  => $s_renewal_year_options,	
 					'S_LIMIT_RECORDS'		=> $s_limit_records,
 					'S_SORT_KEY'			=> $s_sort_key,
 					'S_SORT_DIR'			=> $s_sort_dir,
@@ -577,5 +633,27 @@ class acp_membership
         include_once($phpbb_root_path . 'includes/functions_admin.' . $phpEx);
 		return $forum_list = make_forum_select($value, false, true, false, false, false, false);
 	}
+	/**
+	* Select Application action
+	*/
+	function rank($value)
+	{
+        global $db, $user;
+    	$sql = 'SELECT *
+    		FROM ' . RANKS_TABLE . '
+    		WHERE rank_special = 1
+    		ORDER BY rank_title';
+    	$result = $db->sql_query($sql);
+    
+    	$s_rank_options = '<option value="0"' . ((!$value) ? ' selected="selected"' : '') . '>' . $user->lang['NO_SPECIAL_RANK'] . '</option>';
+    
+    	while ($row = $db->sql_fetchrow($result))
+    	{
+    		$selected = ($value == $row['rank_id']) ? ' selected="selected"' : '';
+    		$s_rank_options .= '<option value="' . $row['rank_id'] . '"' . $selected . '>' . $row['rank_title'] . '</option>';
+    	}
+    	$db->sql_freeresult($result);
+        return ($s_rank_options);
+    }
 }
 ?>

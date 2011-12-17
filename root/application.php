@@ -26,11 +26,14 @@ $user->setup('mods/application');
 
 // You need to login before being able to send out an application
 
-if ($user->data['user_id'] == ANONYMOUS)
+$registering			= request_var('r', 0);
+if (!$registering)
 {
-    login_box('', $user->lang['LOGIN_APPLICATION_FORM']);
+	if ($user->data['user_id'] == ANONYMOUS)
+	{
+		login_box('', $user->lang['LOGIN_APPLICATION_FORM']);
+	}
 }
-
 include($phpbb_root_path . 'includes/functions_posting.' . $phpEx);
 include($phpbb_root_path . 'includes/functions_user.' . $phpEx);
 include($phpbb_root_path . 'includes/functions_membership.' . $phpEx);
@@ -41,8 +44,17 @@ global $config, $phpbb_root_path, $phpEx;
 
 $mode			= request_var('mode', '');
 $type			= request_var('type', '');
-$userid			= request_var('i', '');
+$userid			= request_var('i', 0);
 $groupid		= request_var('g','');
+if ($userid==0)
+{
+    $userid				= $user->data['user_id'];
+}
+if ($groupid==0)
+{
+	$groupid			= $config['ms_subscription_group'];
+}
+
 $payment_method	= request_var('method', 'payment');
 $action			= request_var('action','');
 //$subscribe      = request_var('subscribing', '0');
@@ -326,6 +338,7 @@ switch ($mode)
                 $p->params['billing']   = $billing;
                 $p->params['subscribing']= $subscribing;
                 $p->params['return']    = 'application';
+                $p->params['r']         = request_var('r',0);
 
                 if ($subscribing)
                 {
@@ -356,11 +369,9 @@ switch ($mode)
                 }
         }            
 
-        if ($user->data['user_type'] !=2)
+        if ($registering || $user->data['user_type'] !=2)
         {
-    		$userid				= $user->data['user_id'];
-    		$groupid			= $config['ms_subscription_group'];
-            $membership_info    = display_subscription_message($userid, $groupid);
+            $membership_info    = display_subscription_message($userid, $groupid, $registering);
             if ($error != '')
             {
                 $membership_info['ERROR_MESSAGE'] = $error . '<br />';
@@ -377,7 +388,8 @@ switch ($mode)
             }
 
     		page_header($user->lang['MEMBERSHIP_DETAILS_PAGETITLE']);
-            if (!$is_member)
+          
+            if (!($is_member || $registering))
             {
         		if (!function_exists('generate_profile_fields'))
                 {
@@ -415,7 +427,9 @@ switch ($mode)
                 else
                 {
                     // Set up membership options
-                    present_billing_cycle();
+  
+					present_billing_cycle();
+
                     $template->assign_vars(array(
         				'S_ACTION'	=> append_sid("{$phpbb_root_path}application.$phpEx","mode=apply&i={$userid}&g={$groupid}&result=billing&ref={$membership_info['MEMBERSHIP_NO']}"),
                         ));		
@@ -431,7 +445,7 @@ switch ($mode)
                     present_billing_cycle();
     
                     $template->assign_vars(array(
-        				'S_ACTION'	=> append_sid("{$phpbb_root_path}application.$phpEx","mode=apply&i={$userid}&g={$groupid}&result=billing&ref={$membership_info['MEMBERSHIP_NO']}"),
+        				'S_ACTION'	=> append_sid("{$phpbb_root_path}application.$phpEx","mode=apply&i={$userid}&g={$groupid}&result=billing&ref={$membership_info['MEMBERSHIP_NO']}&r={$registering}"),
                         ));		
     				$template->set_filenames(array(
     					'body' => 'shopping_item.html',

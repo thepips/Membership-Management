@@ -282,7 +282,7 @@ function calc_date($billing_cycle=1, $billing_cycle_basis='y', $date=0)
 }
 
 
-function set_renewal_date($group_id, $user_id, $renew_until_date)
+function set_renewal_date($groupid, $userid, $renew_until_date)
 {
     global $db;
 	$sql_ary = array(
@@ -301,8 +301,8 @@ function set_renewal_date($group_id, $user_id, $renew_until_date)
 		$db->sql_return_on_error(true);
 		$db->sql_query('INSERT ' . MEMBERSHIP_TABLE . ' ' . $db->sql_build_array('INSERT', array_merge(
             array(
-    			'user_id'			=> $user_id,
-                'group_id'          => $group_id,
+    			'user_id'			=> $userid,
+                'group_id'          => $groupid,
             ),
             $sql_ary
 		)));
@@ -310,6 +310,30 @@ function set_renewal_date($group_id, $user_id, $renew_until_date)
 		$db->sql_return_on_error(false);
 	}
 }
+function update_membership($groupid, $userid, $sql_ary)
+{
+    global $db;
+
+	$sql = 'UPDATE ' . MEMBERSHIP_TABLE . '
+		SET ' . $db->sql_build_array('UPDATE', $sql_ary) . '
+		WHERE group_id = ' . (int) $groupid . ' AND user_id = ' . (int) $userid;
+    $db->sql_query($sql);        
+    
+	if (!$db->sql_affectedrows())
+	{
+		$db->sql_return_on_error(true);
+		$db->sql_query('INSERT ' . MEMBERSHIP_TABLE . ' ' . $db->sql_build_array('INSERT', array_merge(
+            array(
+    			'user_id'			=> $userid,
+                'group_id'          => $groupid,
+            ),
+            $sql_ary
+		)));
+		$result = $db->sql_query($sql);
+		$db->sql_return_on_error(false);
+	}
+}
+
 /**
 * Lists members
 */
@@ -480,13 +504,13 @@ function remove_member($groupid, $userid, $associate=0)
     global $config, $db;
     if ($associate>0)
     {
-        remove_member($groupid, $userid);
+        remove_member($groupid, $associate);
     }
     $sql = 'UPDATE ' . USERS_TABLE . " SET user_rank = 0 WHERE user_id={$userid} AND user_rank <> {$config['ms_rank']}";
     $result =$db->sql_query($sql);
 	$db->sql_freeresult($result);
     
-    $sql = 'DELETE FROM ' . MEMBERSHIP_TABLE . " WHERE user_id = {$data['user_id']} AND group_id = {$data['group_id']}";
+    $sql = 'DELETE FROM ' . MEMBERSHIP_TABLE . " WHERE user_id = {$userid} AND group_id = {$groupid}";
 	$result = $db->sql_query($sql);
 	$db->sql_freeresult($result);
 

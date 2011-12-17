@@ -57,6 +57,12 @@ $language_file = 'mods/application';
 * The version numbering must otherwise be compatible with the version_compare function - http://php.net/manual/en/function.version-compare.php
 */
 $versions = array(
+    '0.0.13'	=> array(
+		'config_add' => array(
+			array('ms_associate_rank', '0', 0),
+        ),
+    ),
+//  No changes required for V0.0.12
     '0.0.11'	=> array(
 		'module_add' => array(
 		    array('acp', 'ACP_CAT_USERS', array(
@@ -76,6 +82,10 @@ $versions = array(
         ),
     ),
     '0.0.10'	=> array(
+		'config_add' => array(
+			array('ms_allow_associate',0),
+			array('ms_process_on_payment',0),
+        ),
     ),
     '0.0.9'	=> array(
 		'table_column_add' => array(

@@ -1,14 +1,10 @@
 	<form id="user_membership" method="post" action="{U_ACTION}">
-    <!-- IF NOT_MEMBER -->
-		<div class="errorbox">
-			<p>{L_NOT_MEMBER}</p>
-		</div>
-	<!-- ELSE -->
     	<fieldset>
     		<legend>{L_USER_MEMBERSHIP}</legend>
     	<dl>
-    		<dt><label for="icq">{L_MEMBERSHIP_NO}:</label><br /><span>{L_MEMBERSHIP_NO_EXPLAIN}</span></dt>
-    		<dd><input type="text" id="membership_no" name="membership_no" value="{MEMBERSHIP_NO}" /></dd>
+    		<dt><label for="membership_no">{L_MEMBERSHIP_NO}:</label><br /><span>{L_MEMBERSHIP_NO_EXPLAIN}</span></dt>
+    		<dd><input type="text" id="membership_no" name="membership_no" value="{MEMBERSHIP_NO}" /><!-- IF NOT_MEMBER --><span> Not a premium member</span><!-- ENDIF -->
+</dd>
     	</dl>
     	<dl>
     		<dt><label for="associate_id">{L_ASSOCIATE_NAME}:</label><br /><span>{L_ASSOCIATE_NAME_EXPLAIN}</span></dt>
@@ -25,8 +21,12 @@
     	</fieldset>
     
     	<fieldset class="quick">
+        <!-- IF NOT_MEMBER -->
+    		<input class="button1" type="submit" name="update" value="{L_JOIN}" />
+    	<!-- ELSE -->
+    		<input class="button1" type="submit" name="delete" value="{L_DELETE}" />
     		<input class="button1" type="submit" name="update" value="{L_SUBMIT}" />
+    	<!-- ENDIF -->
     		{S_FORM_TOKEN}
     	</fieldset>
-	<!-- ENDIF -->
 	</form>
