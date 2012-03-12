@@ -1,32 +1,32 @@
 	<form id="user_membership" method="post" action="{U_ACTION}">
-    	<fieldset>
-    		<legend>{L_USER_MEMBERSHIP}</legend>
-    	<dl>
-    		<dt><label for="membership_no">{L_MEMBERSHIP_NO}:</label><br /><span>{L_MEMBERSHIP_NO_EXPLAIN}</span></dt>
-    		<dd><input type="text" id="membership_no" name="membership_no" value="{MEMBERSHIP_NO}" /><!-- IF NOT_MEMBER --><span> Not a premium member</span><!-- ENDIF -->
+		<fieldset>
+			<legend>{L_USER_MEMBERSHIP}</legend>
+		<dl>
+			<dt><label for="membership_no">{L_MEMBERSHIP_NO}:</label><br /><span>{L_MEMBERSHIP_NO_EXPLAIN}</span></dt>
+			<dd><input type="text" id="membership_no" name="membership_no" value="{MEMBERSHIP_NO}" /><!-- IF NOT_MEMBER --><span> Not a premium member</span><!-- ENDIF -->
 </dd>
-    	</dl>
-    	<dl>
-    		<dt><label for="associate_id">{L_ASSOCIATE_NAME}:</label><br /><span>{L_ASSOCIATE_NAME_EXPLAIN}</span></dt>
-    		<dd><input type="text" id="associate_name" name="associate_name" value="{ASSOCIATE_NAME}" /></dd>
-    	</dl>
-    	<dl> 
-    		<dt><label for="renewal_date">{L_RENEWAL}:</label><br /><span>{L_RENEWAL_EXPLAIN}</span></dt>
-    		<dd>{L_DAY}: <select id="renewal_date" name="rday_day">{S_RENEWAL_DAY_OPTIONS}</select> {L_MONTH}: <select name="rday_month">{S_RENEWAL_MONTH_OPTIONS}</select> {L_YEAR}: <select name="rday_year">{S_RENEWAL_YEAR_OPTIONS}</select></dd>
-    	</dl>
-    	<dl> 
-    		<dt><label for="datepaid">{L_DATEPAID}:</label><br /><span>{L_DATEPAID_EXPLAIN}</span></dt>
-    		<dd>{L_DAY}: <select id="datepaid" name="pday_day">{S_PAID_DAY_OPTIONS}</select> {L_MONTH}: <select name="pday_month">{S_PAID_MONTH_OPTIONS}</select> {L_YEAR}: <select name="pday_year">{S_PAID_YEAR_OPTIONS}</select></dd>
-    	</dl>
-    	</fieldset>
-    
-    	<fieldset class="quick">
-        <!-- IF NOT_MEMBER -->
-    		<input class="button1" type="submit" name="update" value="{L_JOIN}" />
-    	<!-- ELSE -->
-    		<input class="button1" type="submit" name="delete" value="{L_DELETE}" />
-    		<input class="button1" type="submit" name="update" value="{L_SUBMIT}" />
-    	<!-- ENDIF -->
-    		{S_FORM_TOKEN}
-    	</fieldset>
+		</dl>
+		<dl>
+			<dt><label for="associate_id">{L_ASSOCIATE_NAME}:</label><br /><span>{L_ASSOCIATE_NAME_EXPLAIN}</span></dt>
+			<dd><input type="text" id="associate_name" name="associate_name" value="{ASSOCIATE_NAME}" /></dd>
+		</dl>
+		<dl> 
+			<dt><label for="renewal_date">{L_RENEWAL}:</label><br /><span>{L_RENEWAL_EXPLAIN}</span></dt>
+			<dd>{L_DAY}: <select id="renewal_date" name="rday_day">{S_RENEWAL_DAY_OPTIONS}</select> {L_MONTH}: <select name="rday_month">{S_RENEWAL_MONTH_OPTIONS}</select> {L_YEAR}: <select name="rday_year">{S_RENEWAL_YEAR_OPTIONS}</select></dd>
+		</dl>
+		<dl> 
+			<dt><label for="datepaid">{L_DATEPAID}:</label><br /><span>{L_DATEPAID_EXPLAIN}</span></dt>
+			<dd>{L_DAY}: <select id="datepaid" name="pday_day">{S_PAID_DAY_OPTIONS}</select> {L_MONTH}: <select name="pday_month">{S_PAID_MONTH_OPTIONS}</select> {L_YEAR}: <select name="pday_year">{S_PAID_YEAR_OPTIONS}</select></dd>
+		</dl>
+		</fieldset>
+	
+		<fieldset class="quick">
+		<!-- IF NOT_MEMBER -->
+			<input class="button1" type="submit" name="update" value="{L_JOIN}" />
+		<!-- ELSE -->
+			<input class="button1" type="submit" name="delete" value="{L_DELETE}" />
+			<input class="button1" type="submit" name="update" value="{L_SUBMIT}" />
+		<!-- ENDIF -->
+			{S_FORM_TOKEN}
+		</fieldset>
 	</form>

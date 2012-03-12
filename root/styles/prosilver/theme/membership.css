@@ -1,0 +1,333 @@
+/* Membership Styles
+---------------------------------------- */
+li.header dt.column20pc {
+	float: left;
+	width: 15%;
+}
+
+ul.topiclist dt.column20pc {
+	float: left;
+	width: 15%;
+}
+.column10pc {
+	float: left;
+	width: 10%;
+	text-align: center;
+}
+.column15pc {
+	float: left;
+	width: 15%;
+	text-align: center;
+}
+.column10pcleft {
+	float: left;
+	width: 10%;
+	text-align: left;
+}
+.column10pcright {
+	float: right;
+	width: 10%;
+	text-align: right;
+}
+.column15pcleft {
+	float: left;
+	width: 15%;
+	text-align: left;
+}
+.column20pc {
+	float: left;
+	width: 20%;
+}
+.column30pc {
+	float: left;
+	width: 30%;
+}
+.column60pc {
+	float: left;
+	width: 60%;
+}
+dd.message {
+	width: 100%;
+}
+.wrong {
+	color: red;
+}
+.ok {
+	color: black;
+}
+.form_ok {
+	color: black;
+	display:none;
+}
+.form_error {
+	color: red;
+	display:block;
+}
+fieldset.product dt {
+	border-right: medium none;
+	display: block;
+	float: left;
+	font-size: 1.1em;
+	margin: 0;
+	padding: 0;
+	text-align: left;
+	width: 35%;
+}
+fieldset.product dd {
+	border-left: medium none;
+	float: left;
+	font-size: 1.1em;
+	margin-left: 0;
+	padding: 0 5px;
+	width: auto;
+}
+dd.price {
+	width: 15%;
+	text-align: right;
+	line-height: 2.2em;
+	font-size: 1.2em;
+	padding: 5px;
+	border: 5px;
+ }
+dd.options {
+	width: 10%;
+	text-align: center;
+	line-height: 2.2em;
+	font-size: 1.2em;
+	padding: 5px;
+	border: 5px;
+}
+dd.actions {
+	width:15%;
+}
+
+li.header dl.product 
+{
+	min-height: 0;
+}
+
+li.header dl.product dt 
+{
+	/* Tweak for headers alignment when folder product used */
+	padding-left: 0;
+	padding-right: 50px;
+}
+
+/* Forum list column styles */
+dl.product 
+{
+	min-height: 35px;
+	background-position: 10px 50%;		/* Position of folder product */
+	background-repeat: no-repeat;
+}
+
+dl.product dt 
+{
+	padding-left: 45px;					/* Space for folder product */
+	background-repeat: no-repeat;
+	background-position: 5px 95%;		/* Position of topic product */
+}
+
+dd.posts, dd.topics, dd.views 
+{
+	width: 8%;
+	text-align: center;
+	line-height: 2.2em;
+	font-size: 1.2em;
+}
+
+/* List in forum description */
+dl.product dt ol,
+dl.product dt ul 
+{
+	list-style-position: inside;
+	margin-left: 1em;
+}
+
+dl.product dt li 
+{
+	display: list-item;
+	list-style-type: inherit;
+}
+
+.payment_button
+{ 
+	color:white;
+	height: 45px;
+	width: 116px;
+	background-color: transparent;
+	background-repeat: no-repeat;
+	border: 0px solid #FFFFFF;
+	display: block;
+	cursor: pointer;
+}
+
+.product-icon span
+{ 
+	background-image: url("{IMG_BUTTON_TOPIC_REPLY_SRC}"); 
+}
+.buttons div.product-icon
+{ 
+	width: {IMG_BUTTON_TOPIC_NEW_WIDTH}px; height: {IMG_BUTTON_TOPIC_NEW_HEIGHT}px; 
+}
+.sd-button {
+	background: transparent url(btn_blue_sprite.gif) no-repeat right -140px; 
+  display:inline-block;
+	padding-right: 9px; /* Right hand bit sliding doors padding */
+	cursor:pointer;
+}
+
+.sd-button .form_button
+{
+  padding:0;
+  margin:0;
+}
+
+.sd-button input.form_button {
+	background: transparent url(btn_blue_sprite.gif) no-repeat left top; 
+  padding-left:8px;
+  padding-right:2px;
+  text-align:center;
+  line-height:26px;
+  height:50px;
+  margin-left:0px; /* fixes margin issue with safari and chrome. no an issue for ie or ff. */
+  display:inline-block;
+}
+
+input.form_button {
+  cursor:pointer;
+  font-weight:bold;
+  display:inline-block;
+  border:0;
+  font-size:14px;
+  color:#FFFFFF;
+	width: auto; /* fixes width issue for ie browsers */
+	overflow:visible; /* fixes width issue for ie browsers */
+}
+
+.sd-button:hover input.form_button {
+	background-position: 0 -70px;	
+  color:#FFFFFF;
+}
+
+.sd-button:active input.form_button {
+	background-position: 0 -70px;
+  color:#FFFFFF;
+}
+
+.sd-button:hover {
+  background-position:right -210px;
+}
+
+.sd-button:hover .form_buttom {
+  background-position:0 -70px;
+}
+
+.sd-button:active {
+	background-position:right -210px;
+}
+
+.sd-button:active .form_button {
+	background-position:0 -70px;
+}
+
+input.form_button[type="submit"]::-moz-focus-inner, input.form_button[type="button"]::-moz-focus-inner {	
+  border : 0px;
+} 
+
+input.form_button[type="submit"]:focus, input.form_button[type="button"]:focus{	
+  outline : none; 
+}
+/* SMALLER BUTTON */
+
+.sd-button-small {
+	background: transparent url(btn_blue_sprite_small.gif) no-repeat right -70px; 
+  display:inline-block;
+	padding-right: 9px; /* Right hand bit sliding doors padding */
+	cursor:pointer;
+}
+
+.sd-button-small .form_button
+{
+  padding:0;
+  margin:0;
+}
+
+input.form_button {
+  cursor:pointer;
+  font-weight:bold;
+  display:inline-block;
+  border:0;
+  font-size:14px;
+  color:#FFFFFF;
+	width: auto; /* fixes width issue for ie browsers */
+	overflow:visible; /* fixes width issue for ie browsers */
+}
+
+.sd-button-small input.form_button {
+	background: transparent url(btn_blue_sprite_small.gif) no-repeat left top; 
+  padding-left:8px;
+  padding-right:2px;
+  text-align:center;
+  line-height:26px;
+  height:25px;
+  margin-left:0px; /* fixes margin issue with safari and chrome. no an issue for ie or ff. */
+  display:inline-block;
+  font-size:12px;
+}
+
+.sd-button-small:hover input.form_button {
+	background-position: 0 -35px;	
+  color:#FFFFFF;
+}
+
+.sd-button-small:active input.form_button {
+	background-position: 0 -35px;
+  color:#FFFFFF;
+}
+
+.sd-button-small:hover {
+  background-position:right -105px;
+}
+
+.sd-button-small:hover .form_buttom {
+  background-position:0 -35px;
+}
+
+.sd-button-small:active {
+	background-position:right -105px;
+}
+
+.sd-button-small:active .form_button {
+	background-position:0 -35px;
+}
+
+input.form_button[type="submit"]::-moz-focus-inner, input.form_button[type="button"]::-moz-focus-inner {	
+  border : 0px;
+} 
+
+input.form_button[type="submit"]:focus, input.form_button[type="button"]:focus{	
+  outline : none; 
+}
+.centeredImage
+{
+	text-align:center;
+	margin-top:0px;
+	margin-bottom:0px;
+	padding:0px;
+}
+/* proSilver Style Sheet Tweaks
+
+These style definitions are mainly IE specific 
+tweaks required due to its poor CSS support.
+-------------------------------------------------*/
+* html span.corners-top, * html span.corners-bottom { background-image: url("{T_THEME_PATH}/images/corners_left.gif"); }
+* html span.corners-top span, * html span.corners-bottom span { background-image: url("{T_THEME_PATH}/images/corners_right.gif"); }
+
+span.corners-top, span.corners-bottom, span.corners-top span, span.corners-bottom span, span.divider {
+	font-size: 1px;
+	line-height: 1px;
+	display: block;
+	height: 5px;
+	background-repeat: no-repeat;
+}

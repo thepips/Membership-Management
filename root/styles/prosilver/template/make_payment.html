@@ -6,8 +6,8 @@
 		{MESSAGE}
 	<!-- ENDIF -->
 	<br />
-        
-    {PAYMENT_REF}<br /><br />
+		
+	{PAYMENT_REF}<br /><br />
 	<fieldset>
 	<!-- IF PAYMENT_TYPE == 'cheque' -->
 
@@ -36,9 +36,9 @@
 	<!-- ENDIF -->
 	</fieldset>
 	<p class="submit-buttons">
-		<input class="button" type="submit" id="submit" name="submit" value="{L_SUBMIT}" />&nbsp;
+		<span class="sd-button"><input type="submit" class="form_button" id="submit" name="submit" value="{L_SUBMIT}"></span>
 	<!-- IF PAYMENT_TYPE != '' -->
-		<input class="button" type="submit" id="backout" name="backout" value="{L_CANCEL}" />
+		<span class="sd-button"><input type="submit" class="form_button" id="backout" name="backout" value="{L_CANCEL}"></span>
 	<!-- ENDIF -->
 	</p>
 {S_FORM_TOKEN}

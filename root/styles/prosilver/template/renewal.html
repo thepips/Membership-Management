@@ -1,53 +1,53 @@
-    <div class="forabg">
+	<div class="forabg">
 	<div class="inner"><span class="corners-top"><span></span></span>
 		<ul class="topiclist">
 			<li class="header">
 				<dl class="message">
 					<dt>
-                        {L_MEMBERSHIP_DETAILS_PAGETITLE} 
-                        {MEMBERSHIP_NO}</dt>
+						{L_MEMBERSHIP_DETAILS_PAGETITLE} 
+						{MEMBERSHIP_NO}</dt>
 				</dl>
 			</li>
 		</ul>
-        <form method="post" action="{S_ACTION}" id="renew_form">
+		<form method="post" action="{S_ACTION}" id="renew_form">
 		<ul class="topiclist forums">
 			<li>
-                <dl>
-                    <dd class="message">
-                        <p style="margin: 0pt 5px">
-        				<!-- IF IS_ASSOCIATE -->
-                            {L_ASSOCIATE_MEMBER}
-        				<!-- ELSEIF MEMBERSHIP_PENDING -->
-                            {L_MEMBERSHIP_PENDING}
-    				    <!-- ELSE -->			
-            				<!-- IF ALLOW_ASSOCIATES -->
-                                <span style="float: right">
-                                    <span style="color: red;">{ERROR_MESSAGE}</span> 
-                                    Associate Member
-                                    <input 
-                                        type="text" 
-                                        id="associate" 
-                                        title="Associate User Id" 
-                                        name="associate" 
-                                        value="{ASSOCIATE}"
-                                        size="10"
-                                        onchange="this.form.submit()"  
-                                        />
-                                </span>
-            				<!-- ENDIF -->
-                            {RENEWAL_MESSAGE}
-        					<!-- IF SUBSCRIBER -->
-        				        <br />
-                                {L_SUBSCRIBER}<a href="{CANCEL_SUB_ACTION}"><img src="{T_IMAGESET_LANG_PATH}/cancel_sub.png" name="cancel_sub" align="middle"></a>
-          					<!-- ELSEIF UNCLEARED -->
-                                {PAYMENT_MESSAGE}
-                            <!-- ELSE -->
-                                <a href="{RENEWAL_ACTION}"><img src="{T_IMAGESET_LANG_PATH}/renew_membership.png" name="application" align="middle"></a>
-                            <!-- ENDIF -->
-    					<!-- ENDIF -->
-                        </p>
-                    </dd>
-                </dl>
+				<dl>
+					<dd class="message">
+						<p style="margin: 0pt 5px">
+						<!-- IF IS_ASSOCIATE -->
+							{L_ASSOCIATE_MEMBER}
+						<!-- ELSEIF MEMBERSHIP_PENDING -->
+							{L_MEMBERSHIP_PENDING}
+						<!-- ELSE -->			
+							<!-- IF ALLOW_ASSOCIATES -->
+								<span style="float: right">
+									<span style="color: red;">{ERROR_MESSAGE}</span> 
+									Associate Member
+									<input 
+										type="text" 
+										id="associate" 
+										title="Associate User Id" 
+										name="associate" 
+										value="{ASSOCIATE}"
+										size="10"
+										/>
+									<span class="sd-button-small"><input type="submit" class="form_button" id="edit_associate" name="edit_associate" value="{L_CHANGE_ASSOCIATE}"></span>
+								</span>
+							<!-- ENDIF -->
+							{RENEWAL_MESSAGE}
+							<!-- IF SUBSCRIBER -->
+								<br />
+								{L_SUBSCRIBER}<span class="sd-button-small"><input type="submit" class="form_button" id="cancel_sub" name="cancel_sub" value="{L_CANCEL_SUB}"></span>
+		  					<!-- ELSEIF UNCLEARED -->
+								{PAYMENT_MESSAGE}
+							<!-- ELSE -->
+								<span class="sd-button-small"><input type="submit" class="form_button" id="application" name="application" value="{L_RENEW_MEMBERSHIP}"></span>
+							<!-- ENDIF -->
+						<!-- ENDIF -->
+						</p>
+					</dd>
+				</dl>
 			</li>
 		</ul>
 		</form>

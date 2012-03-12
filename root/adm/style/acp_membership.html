@@ -31,10 +31,10 @@ Click <a href="{U_GENERATION}">Here</a> to run membership reports
 <tbody>
 <!-- BEGIN members -->
 	<!-- IF members.S_ROW_COUNT is even --><tr class="row1"><!-- ELSE --><tr class="row2"><!-- ENDIF -->
-
 		<td style="vertical-align: top;">
 			{members.USERNAME_FULL}
 			<!-- IF members.POSTS --><br />{L_POSTS}: <strong>{members.POSTS}</strong> [<a href="{members.U_SEARCH_USER}">{L_SEARCH_USER_POSTS}</a>]<!-- ENDIF -->
+			<!-- IF members.ERROR_MESSAGE --><br /><span style="color: red;">{members.ERROR_MESSAGE}</span> <!-- ENDIF -->
 		</td>
 		<td style="vertical-align: top;">{members.PF_REALNAME}</td>
 		<td style="vertical-align: top;">{members.JOINED}</td>

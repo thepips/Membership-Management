@@ -1,9 +1,14 @@
 <?php
-
 /**
- * @author Action Replay
- * @copyright 2011
- */
+* @package cron_membership.php
+* @copyright (c) DougA http://action-replay.co.uk 2011
+* @license http://opensource.org/licenses/gpl-license.php GNU Public License
+*
+*/
+if (!defined('IN_PHPBB'))
+{
+	exit;
+}
 
     if (!function_exists('calc_date'))
     {
@@ -35,7 +40,7 @@
 	{
         $delete_members[]=$row;
     }
-    foreach($delete_members => $data)
+    foreach($delete_members as $data)
     {
         remove_member($data['group_id'],$data['user_id'],$data['associate']);
         log_message('LOG_USER_GROUP_EXPIRED', $data['username_clean'],$data['group_name']);
@@ -79,7 +84,10 @@
 		if ($row = $db->sql_fetchrow($result))
 		{
 			// Send the messages
-			include_once($phpbb_root_path . 'includes/functions_messenger.' . $phpEx);
+			if (!class_exists('messenger'))
+			{
+				include($phpbb_root_path . 'includes/functions_messenger.' . $phpEx);
+			}
 
 			$messenger = new messenger();
 			$usernames = $user_ids = array();

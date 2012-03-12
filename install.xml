@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <?xml-stylesheet type="text/xsl" href="modx.prosilver.en.xsl"?>
 <!--NOTICE: Please open this file in your web browser. If presented with a security warning, you may safely tell it to allow the blocked content.-->
 <!--For security purposes, please check: http://www.phpbb.com/mods/ for the latest version of this MOD.\nAlthough MODs are checked before being allowed in the MODs Database there is no guarantee that there are no security problems within the MOD.\nNo support will be given for MODs not found within the MODs Database which can be found at http://www.phpbb.com/mods/-->
@@ -19,7 +19,7 @@ Payment can be made by Cheque, EFT and Paypal using Express Checkout backed up w
         <email><![CDATA[doug@arvclub.co.uk]]></email>
       </author>
     </author-group>
-    <mod-version>0.0.13 Alpha</mod-version>
+    <mod-version>0.0.19 Alpha</mod-version>
     <installation>
       <level>intermediate</level>
       <time>1800</time>
@@ -28,69 +28,52 @@ Payment can be made by Cheque, EFT and Paypal using Express Checkout backed up w
   </header>
   <action-group>
     <copy>
-      <file from="root/IPNListener.php" to="IPNListener.php" />
       <file from="root/application.php" to="application.php" />
       <file from="root/createMembership.php" to="createMembership.php" />
       <file from="root/generate_mailing_list.php" to="generate_mailing_list.php" />
+      <file from="root/IPNListener.php" to="IPNListener.php" />
       <file from="root/shopping.php" to="shopping.php" />
       <file from="root/adm/style/acp_membership.html" to="adm/style/acp_membership.html" />
       <file from="root/adm/style/acp_users_membership.html" to="adm/style/acp_users_membership.html" />
-      <file from="root/images/ExtendPP1.gif" to="images/ExtendPP1.gif"></file>
-      <file from="root/images/btn_buynowCC_LG.gif" to="images/btn_buynowCC_LG.gif" />
-      <file from="root/images/btn_subscribeCC_LG.gif" to="images/btn_subscribeCC_LG.gif" />
-      <file from="root/images/cancel_sub.png" to="images/cancel_sub.png" />
       <file from="root/images/cross.gif" to="images/cross.gif" />
       <file from="root/images/cross_grey.gif" to="images/cross_grey.gif" />
       <file from="root/images/logo_paypal.gif" to="images/logo_paypal.gif" />
-      <file from="root/images/one_off.png" to="images/one_off.png" />
-      <file from="root/images/paynow.gif" to="images/paynow.gif" />
-      <file from="root/images/paynow.png" to="images/paynow.png" />
       <file from="root/images/pound.gif" to="images/pound.gif" />
       <file from="root/images/pound_grey.gif" to="images/pound_grey.gif" />
       <file from="root/images/pound_slash.gif" to="images/pound_slash.gif" />
-      <file from="root/images/renew_membership.png" to="images/renew_membership.png" />
-      <file from="root/images/subscription.png" to="images/subscription.png" />
-      <file from="root/images/tick.gif" to="images/tick.gif" />
+      <file from="root/images/spacer.gif" to="images/spacer.gif" />
+      <file from="root/images/tick.gif" to="images/tick.gif"></file>
       <file from="root/images/tick_grey.gif" to="images/tick_grey.gif" />
-      <file from="root/images/x-click-butcc-subscribe.gif" to="images/x-click-butcc-subscribe.gif" />
       <file from="root/includes/cheque_class.php" to="includes/cheque_class.php" />
       <file from="root/includes/cron_membership.php" to="includes/cron_membership.php" />
-      <file from="root/includes/eft_class.php" to="includes/eft_class.php" />
-      <file from="root/includes/functions_membership.php" to="includes/functions_membership.php" />
-      <file from="root/includes/functions_payment.php" to="includes/functions_payment.php" />
-      <file from="root/includes/functions_shop.php" to="includes/functions_shop.php" />
+      <file from="root/includes/currency_format.php" to="includes/currency_format.php" />
+      <file from="root/includes/eft_class.php" to="includes/eft_class.php"></file>
+      <file from="root/includes/functions_membership.php" to="includes/functions_membership.php"></file>
       <file from="root/includes/payment_class.php" to="includes/payment_class.php" />
       <file from="root/includes/paypal_class.php" to="includes/paypal_class.php" />
       <file from="root/includes/acp/acp_membership.php" to="includes/acp/acp_membership.php" />
       <file from="root/includes/acp/acp_payments.php" to="includes/acp/acp_payments.php" />
+      <file from="root/language/en/mods/application.php" to="language/en/mods/application.php" />
       <file from="root/includes/acp/acp_users_membership.php" to="includes/acp/acp_users_membership.php" />
       <file from="root/includes/acp/info/acp_membership.php" to="includes/acp/info/acp_membership.php"></file>
       <file from="root/includes/acp/info/acp_payments.php" to="includes/acp/info/acp_payments.php" />
-      <file from="root/language/en/mods/application.php" to="language/en/mods/application.php" />
       <file from="root/language/en/mods/info_acp_membership.php" to="language/en/mods/info_acp_membership.php" />
       <file from="root/language/en/mods/info_acp_payments.php" to="language/en/mods/info_acp_payments.php" />
-      <file from="root/language/en/mods/shop.php" to="language/en/mods/shop.php" />
-      <file from="root/styles/prosilver/imageset/en/cancel_sub.png" to="styles/prosilver/imageset/en/cancel_sub.png" />
-      <file from="root/styles/prosilver/imageset/en/one_off.png" to="styles/prosilver/imageset/en/one_off.png" />
-      <file from="root/styles/prosilver/imageset/en/paynow.png" to="styles/prosilver/imageset/en/paynow.png" />
-      <file from="root/styles/prosilver/imageset/en/renew_membership.png" to="styles/prosilver/imageset/en/renew_membership.png" />
       <file from="root/styles/prosilver/template/appform_body.html" to="styles/prosilver/template/appform_body.html" />
       <file from="root/styles/prosilver/template/make_payment.html" to="styles/prosilver/template/make_payment.html" />
       <file from="root/styles/prosilver/template/membership_details.html" to="styles/prosilver/template/membership_details.html" />
+      <file from="root/styles/prosilver/template/payment_error.html" to="styles/prosilver/template/payment_error.html"></file>
       <file from="root/styles/prosilver/template/payment_form.html" to="styles/prosilver/template/payment_form.html" />
       <file from="root/styles/prosilver/template/renewal.html" to="styles/prosilver/template/renewal.html" />
-      <file from="root/styles/prosilver/template/shopping_item.html" to="styles/prosilver/template/shopping_item.html" />
-      <file from="root/styles/prosilver/theme/application.css" to="styles/prosilver/theme/application.css" />
+      <file from="root/styles/prosilver/template/subscription.html" to="styles/prosilver/template/subscription.html" />
+      <file from="root/styles/prosilver/theme/membership.css" to="styles/prosilver/theme/membership.css"></file>
+      <file from="root/styles/prosilver/theme/btn_blue_sprite_small.gif" to="styles/prosilver/theme/btn_blue_sprite_small.gif"></file>
+      <file from="root/styles/prosilver/theme/btn_blue_sprite.gif" to="styles/prosilver/theme/btn_blue_sprite.gif" />
     </copy>
     <open src="cron.php">
       <edit>
-        <find><![CDATA[				}
-			}
-		}
-
-	break;
-]]></find>
-        <action type="after-add"><![CDATA[	case 'tidy_membership':
+        <find><![CDATA[	case 'prune_forum':]]></find>
+        <action type="before-add"><![CDATA[	case 'tidy_membership':
 		if (time() - $config['membership_gc'] > $config['membership_last_gc'])
 		{
 			include_once($phpbb_root_path . 'includes/cron_membership.' . $phpEx);
@@ -133,17 +116,6 @@ define('MEMBERSHIP_TABLE',          $table_prefix . 'membership');]]></action>
     </open>
     <open src="includes/functions.php">
       <edit>
-        <find><![CDATA[			$cron_type = 'tidy_sessions';
-		}
-]]></find>
-        <action type="after-add"><![CDATA[		else if ($time_now - $config['membership_gc'] > $config['membership_last_gc'])
-		{
-			// Tidy the search
-			$cron_type = 'tidy_membership';
-		}
-]]></action>
-      </edit>
-      <edit>
         <find><![CDATA[	return $var;]]></find>
         <action type="after-add"><![CDATA[}
 
@@ -162,7 +134,15 @@ function get_config($config_id)
       </edit>
       <edit>
         <find><![CDATA[		'L_ONLINE_EXPLAIN'	=> $l_online_time,]]></find>
-        <action type="after-add"><![CDATA[		'U_MEMBERSHIP'			=> append_sid("{$phpbb_root_path}application.$phpEx", 'mode=apply'),    ]]></action>
+        <action type="after-add"><![CDATA[		'U_MEMBERSHIP'			=> append_sid("{$phpbb_root_path}application.$phpEx"),    ]]></action>
+      </edit>
+      <edit>
+        <find>			$cron_type = 'tidy_sessions';</find>
+        <action type="after-add"><![CDATA[		}		
+		else if ($time_now - $config['membership_gc'] > $config['membership_last_gc'])
+		{
+			// Tidy the search
+			$cron_type = 'tidy_membership';]]></action>
       </edit>
     </open>
     <open src="includes/functions_profile_fields.php">
@@ -170,6 +150,11 @@ function get_config($config_id)
         <find><![CDATA[			case 'register':]]></find>
         <action type="before-add"><![CDATA[			case 'application':
                 $sql_where .= " AND field_ident LIKE 'ms_%'";
+]]></action>
+      </edit>
+      <edit>
+        <find><![CDATA[		$db->sql_freeresult($result);]]></find>
+        <action type="after-add"><![CDATA[		return isset($template->_tpldata['profile_fields']) ? (sizeof($template->_tpldata['profile_fields'])) : 0;
 ]]></action>
       </edit>
       <edit>
@@ -191,11 +176,15 @@ function get_config($config_id)
     <open src="includes/ucp/ucp_register.php">
       <edit>
         <find><![CDATA[			return;
+		}]]></find>
+        <action type="after-add"><![CDATA[		if (($config['ms_enable_membership']) && !(($coppa || $config['require_activation'] == USER_ACTIVATION_SELF || $config['require_activation'] == USER_ACTIVATION_ADMIN) && $config['email_enable']))
+		{
+			$premium_sub_option = (int) $config['ms_registration'];
 		}
-		]]></find>
-        <action type="after-add"><![CDATA[		$choice_enabled = (!empty($config['ms_enable_membership'])
-			 && !(($coppa || $config['require_activation'] == USER_ACTIVATION_SELF || $config['require_activation'] == USER_ACTIVATION_ADMIN) && $config['email_enable']));
-]]></action>
+		else
+		{
+			$premium_sub_option = 0;
+		}]]></action>
       </edit>
       <edit>
         <find><![CDATA[			'tz'				=> request_var('tz', (float) $timezone),]]></find>
@@ -203,15 +192,18 @@ function get_config($config_id)
       </edit>
       <edit>
         <find><![CDATA[				$message = $message . '<br /><br />' . sprintf($user->lang['RETURN_INDEX'], '<a href="' . append_sid("{$phpbb_root_path}index.$phpEx") . '">', '</a>');]]></find>
-        <action type="replace-with"><![CDATA[				if ($choice_enabled && $data['premium_membership'])
+        <action type="replace-with"><![CDATA[				if ($premium_sub_option==1)
 				{
-					$message = $message . '<br /><br />' . sprintf($user->lang['CONTINUE_APPLICATION'], '<a href="' . append_sid("{$phpbb_root_path}application.$phpEx","mode=apply&result=index&member=1&r=1&i={$user_id}&g={$config['ms_subscription_group']}") . '">', '</a>');
+					$message = $message . '<br /><br />' . sprintf($user->lang['CONTINUE_APPLICATION'], '<a href="' . append_sid("{$phpbb_root_path}application.$phpEx","mode=apply&member=1&r=1&i={$user_id}&g={$config['ms_subscription_group']}") . '">', '</a>');
 				}
 				else
 				{
+					if ($premium_sub_option==2)
+					{
+						redirect(append_sid("{$phpbb_root_path}application.$phpEx","mode=apply&member=1&r=1&i={$user_id}&g={$config['ms_subscription_group']}"));
+					}
 					$message = $message . '<br /><br />' . sprintf($user->lang['RETURN_INDEX'], '<a href="' . append_sid("{$phpbb_root_path}index.$phpEx") . '">', '</a>');
-				}
-]]></action>
+				}]]></action>
       </edit>
       <edit>
         <find><![CDATA[			'S_UCP_ACTION'		=> append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=register'),]]></find>
@@ -240,25 +232,28 @@ function get_config($config_id)
     <open src="language/en/acp/common.php">
       <edit>
         <find><![CDATA[	'ACP_USER_GROUPS'				=> 'Groups',]]></find>
-        <action type="after-add">	'ACP_USER_MANAGEMENT'			=&gt; 'User management',	'ACP_USER_USERS_MEMBERSHIP'			=&gt; 'Club membership',
-</action>
+        <action type="after-add"><![CDATA[	'ACP_USER_MANAGEMENT'			=> 'User management',
+	'ACP_USER_USERS_MEMBERSHIP'			=> 'Club membership',]]></action>
       </edit>
       <edit>
         <find><![CDATA[	'LOG_WORD_EDIT'			=> '<strong>Edited word censor</strong><br />» %s',]]></find>
         <action type="after-add"><![CDATA[    
     'LOG_USER_GROUP_APPROVED'=> '<strong>%1$s has been approved for membership of </strong><br />» group %2$s',
     'LOG_USER_GROUP_PAID'   => '<strong>Payment marked as received </strong><br />» for %1$s membership of group %2$s',
+    'LOG_USER_GROUP_PAYMENT_SENT'=> '<strong>Payment has been sent </strong><br />» for %1$s membership of group %2$s',
     'LOG_USER_GROUP_RENEWED'=> '<strong>%1$s has renewed their membership </strong><br />» group %2$s',
     'LOG_USER_GROUP_JOINED' => '<strong>%1$s has joined </strong><br />» membership group %2$s',
     'LOG_CONFIG_CONFIG'     => '<strong>Payment configuration settings updated </strong>',
     'LOG_CONFIG_PAYPAL'     => '<strong>Paypal configuration settings updated </strong>',
     'LOG_CONFIG_CHEQUE'     => '<strong>Cheque configuration settings update </strong>',
-    'LOG_CONFIG_EFT'     => '<strong>Bank Transfer configuration settings update </strong>',]]></action>
+    'LOG_CONFIG_EFT'     => '<strong>Bank Transfer configuration settings update </strong>',
+    'USER_LAST_REMINDED'     => '%1$d reminder sent
+» %2$s',]]></action>
       </edit>
     </open>
     <open src="language/en/acp/permissions_phpbb.php">
       <edit>
-        <find><![CDATA[	'acl_a_search'		=> array('lang' => 'Can search board', 'cat' => 'misc'),]]></find>
+        <find><![CDATA[	'acl_a_search'		=> array('lang' => 'Can manage search backends and settings', 'cat' => 'misc'),]]></find>
         <action type="after-add"><![CDATA[	'acl_a_approve_application'=> array('lang' => 'Can approve membership applications', 'cat' => 'misc'),
 	'acl_a_mark_paid'=> array('lang' => 'Can process payments', 'cat' => 'misc'),]]></action>
       </edit>
@@ -276,7 +271,7 @@ function get_config($config_id)
       <edit>
         <find><![CDATA[	<link href="{T_THEME_PATH}/bidi.css" rel="stylesheet" type="text/css" media="screen, projection" />
 <!-- ENDIF -->]]></find>
-        <action type="after-add"><![CDATA[<link href="{T_THEME_PATH}/application.css" rel="stylesheet" type="text/css" media="screen, projection" />]]></action>
+        <action type="after-add"><![CDATA[<link href="{T_THEME_PATH}/membership.css" rel="stylesheet" type="text/css" media="screen, projection" />]]></action>
       </edit>
       <edit>
         <find><![CDATA[					<!-- IF S_DISPLAY_MEMBERLIST --><li class="icon-members"><a href="{U_MEMBERLIST}" title="{L_MEMBERLIST_EXPLAIN}">{L_MEMBERLIST}</a></li><!-- ENDIF -->]]></find>
@@ -290,7 +285,7 @@ function get_config($config_id)
       <edit>
         <find><![CDATA[	<!-- END profile_fields -->
 	<!-- ENDIF -->]]></find>
-        <action type="after-add"><![CDATA[	<!-- IF CHOICE_ENABLED -->
+        <action type="after-add"><![CDATA[	<!-- IF CHOICE_ENABLED == 1 -->
 		<hr />
 		<dl>
 			<dt><label for="premium_membership">{L_MEMBERSHIP_TYPE}:</label><br/></dt>

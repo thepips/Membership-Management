@@ -54,21 +54,21 @@ class acp_payments
 				$display_vars = array(
 					'title'	=> 'ACP_CONFIG',
 					'vars'	=> array(
-						'legend1'                     => 'ACP_PAYMENT_SETTINGS',
-						'pp_payment_locale'           => array('lang' => 'PAYMENT_LOCALE', 'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
-						'pp_payment_method_cheque'    => array('lang' => 'CHEQUE_ENABLED', 'validate' => 'bool', 'type' => 'radio:yes_no',	'explain' => true),
-						'pp_payment_method_eft'       => array('lang' => 'EFT_ENABLED', 'validate' => 'bool', 'type' => 'radio:yes_no',	'explain' => true),
-						'pp_payment_method_paypal'    => array('lang' => 'PAYPAL_ENABLED', 'validate' => 'bool', 'type' => 'radio:yes_no',	'explain' => true),
+						'legend1'						=> 'ACP_PAYMENT_SETTINGS',
+						'pp_enable_payment'				=> array('lang' => 'PP_ENABLE_PAYMENT', 'validate' => 'bool', 'type' => 'radio:yes_no',	'explain' => true),
+						'pp_payment_locale'				=> array('lang' => 'PAYMENT_LOCALE', 'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
+						
 				));
 			break;
 			case 'cheque':
 				$display_vars = array(
 					'title'	=> 'ACP_CONFIG',
 					'vars'	=> array(
-						'legend1'                     => 'CHEQUE_SETTINGS_TITLE',
-                        'pp_subscription_allowed_cheque' => array('lang' => 'SUBSCRIPTION_ALLOWED',		'validate' => 'bool',	'type' => 'radio:yes_no', 'explain' => true),
-						'pp_cheque_address'           => array('lang' => 'PP_CHEQUE_ADDRESS',		'validate' => 'string',	'type' => 'textarea:5:40', 'explain' => true),
-						'pp_cheque_image'             => array('lang' => 'PP_IMAGE',		'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
+						'legend1'						=> 'CHEQUE_SETTINGS_TITLE',
+						'pp_payment_method_cheque'		=> array('lang' => 'CHEQUE_ENABLED', 'validate' => 'bool', 'type' => 'radio:yes_no',	'explain' => true),
+						'pp_subscription_allowed_cheque'=> array('lang' => 'SUBSCRIPTION_ALLOWED',		'validate' => 'bool',	'type' => 'radio:yes_no', 'explain' => true),
+						'pp_cheque_address'				=> array('lang' => 'PP_CHEQUE_ADDRESS',		'validate' => 'string',	'type' => 'textarea:5:40', 'explain' => true),
+						'pp_cheque_image'				=> array('lang' => 'PP_IMAGE',		'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
 				));
 			break;
 
@@ -76,24 +76,25 @@ class acp_payments
 				$display_vars = array(
 					'title'	=> 'ACP_CONFIG',
 					'vars'	=> array(
-						'legend1'					=> 'PAYPAL_GENERAL_SETTINGS_TITLE',
-                        'pp_subscription_allowed_paypal' => array('lang' => 'SUBSCRIPTION_ALLOWED',		'validate' => 'bool',	'type' => 'radio:yes_no', 'explain' => true),
-						'pp_paypal_p_account'		=> array('lang' => 'OUR_PAYPAL_ACCT',		'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
-						'pp_paypal_co_name'	=> array('lang' => 'PAYPAL_CO_NAME',		'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
-						'pp_paypal_currency_code'	=> array('lang' => 'PAYPAL_CURRENCY_CODE',		'validate' => 'string',	'type' => 'text:10:0', 'explain' => true),
-						'pp_paypal_secure'			=> array('lang' => 'PAYPAL_SECURE',		'validate' => 'bool',	'type' => 'radio:yes_no', 'explain' => true),
-						'pp_use_paypal_sandbox'		=> array('lang' => 'PAYPAL_SANDBOX',		'validate' => 'bool',	'type' => 'radio:yes_no', 'explain' => true),
-						'pp_paypal_err_email'         => array('lang' => 'PAYPAL_ERR_EMAIL', 'validate' => 'bool',	'type' => 'custom',	'method' => 'email_notification', 'explain' => true),
-						'pp_email_notification'       => false,
-						'pp_paypal_image'             => array('lang' => 'PP_IMAGE',		'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
-						'legend2'					=> 'PAYPAL_SETTINGS_TITLE',
-						'pp_paypal_API_username'	=> array('lang' => 'PAYPAL_API_USERNAME',		'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
-						'pp_paypal_API_password'	=> array('lang' => 'PAYPAL_API_PASSWORD',		'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
-						'pp_paypal_API_signature'	=> array('lang' => 'PAYPAL_API_SIGNATURE',		'validate' => 'string',	'type' => 'text:80:80', 'explain' => true),
-						'legend3'					=> 'PAYPAL_SANDBOX_SETTINGS_TITLE',
-						'pp_paypal_sandbox_API_username'	=> array('lang' => 'PAYPAL_API_USERNAME',		'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
-						'pp_paypal_sandbox_API_password'	=> array('lang' => 'PAYPAL_API_PASSWORD',		'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
-						'pp_paypal_sandbox_API_signature'	=> array('lang' => 'PAYPAL_API_SIGNATURE',		'validate' => 'string',	'type' => 'text:80:80', 'explain' => true),
+						'legend1'						=> 'PAYPAL_GENERAL_SETTINGS_TITLE',
+						'pp_payment_method_paypal'		=> array('lang' => 'PAYPAL_ENABLED', 'validate' => 'bool', 'type' => 'radio:yes_no',	'explain' => true),
+						'pp_subscription_allowed_paypal'=> array('lang' => 'SUBSCRIPTION_ALLOWED', 'validate' => 'bool',	'type' => 'radio:yes_no', 'explain' => true),
+						'pp_paypal_p_account'			=> array('lang' => 'OUR_PAYPAL_ACCT', 'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
+						'pp_paypal_co_name'				=> array('lang' => 'PAYPAL_CO_NAME', 'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
+						'pp_paypal_currency_code'		=> array('lang' => 'PAYPAL_CURRENCY_CODE', 'validate' => 'string',	'type' => 'text:10:0', 'explain' => true),
+						'pp_paypal_secure'				=> array('lang' => 'PAYPAL_SECURE', 'validate' => 'bool',	'type' => 'radio:yes_no', 'explain' => true),
+						'pp_paypal_use_sandbox'			=> array('lang' => 'PAYPAL_SANDBOX', 'validate' => 'bool',	'type' => 'radio:yes_no', 'explain' => true),
+						'pp_email_notification'	 		=> array('lang' => 'PAYPAL_ERR_EMAIL', 'validate' => 'bool',	'type' => 'custom',	'method' => 'email_notification', 'explain' => true),
+						'pp_paypal_err_email'	   		=> false,
+						'pp_paypal_image'			 	=> array('lang' => 'PP_IMAGE', 'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
+						'legend2'						=> 'PAYPAL_SETTINGS_TITLE',
+						'pp_paypal_API_username'		=> array('lang' => 'PAYPAL_API_USERNAME', 'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
+						'pp_paypal_API_password'		=> array('lang' => 'PAYPAL_API_PASSWORD', 'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
+						'pp_paypal_API_signature'		=> array('lang' => 'PAYPAL_API_SIGNATURE', 'validate' => 'string',	'type' => 'text:80:80', 'explain' => true),
+						'legend3'						=> 'PAYPAL_SANDBOX_SETTINGS_TITLE',
+						'pp_paypal_sandbox_API_username'=> array('lang' => 'PAYPAL_API_USERNAME', 'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
+						'pp_paypal_sandbox_API_password'=> array('lang' => 'PAYPAL_API_PASSWORD', 'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
+						'pp_paypal_sandbox_API_signature'=> array('lang' => 'PAYPAL_API_SIGNATURE', 'validate' => 'string',	'type' => 'text:80:80', 'explain' => true),
 				));
 			break;
 
@@ -101,13 +102,14 @@ class acp_payments
 				$display_vars = array(
 					'title'	=> 'ACP_CONFIG',
 					'vars'	=> array(
-						'legend1'				=> 'EFT_SETTINGS_TITLE',
-                        'pp_subscription_allowed_eft' => array('lang' => 'SUBSCRIPTION_ALLOWED',		'validate' => 'bool',	'type' => 'radio:yes_no', 'explain' => true),
-						'pp_eft_bankname'		=> array('lang' => 'PP_EFT_BANKNAME',		'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
-						'pp_eft_bankaddress'	=> array('lang' => 'PP_EFT_BANKADDRESS',		'validate' => 'string',	'type' => 'textarea:5:40', 'explain' => true),
-						'pp_eft_bankcode'		=> array('lang' => 'PP_EFT_BANKCODE',		'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
-						'pp_eft_account'		=> array('lang' => 'PP_EFT_ACCOUNT',		'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
-						'pp_eft_image'                => array('lang' => 'PP_IMAGE',		'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
+						'legend1'						=> 'EFT_SETTINGS_TITLE',
+						'pp_payment_method_eft'			=> array('lang' => 'EFT_ENABLED', 'validate' => 'bool', 'type' => 'radio:yes_no',	'explain' => true),
+						'pp_subscription_allowed_eft'	=> array('lang' => 'SUBSCRIPTION_ALLOWED',		'validate' => 'bool',	'type' => 'radio:yes_no', 'explain' => true),
+						'pp_eft_bankname'				=> array('lang' => 'PP_EFT_BANKNAME',		'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
+						'pp_eft_bankaddress'			=> array('lang' => 'PP_EFT_BANKADDRESS',		'validate' => 'string',	'type' => 'textarea:5:40', 'explain' => true),
+						'pp_eft_bankcode'				=> array('lang' => 'PP_EFT_BANKCODE',		'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
+						'pp_eft_account'				=> array('lang' => 'PP_EFT_ACCOUNT',		'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
+						'pp_eft_image'					=> array('lang' => 'PP_IMAGE',		'validate' => 'string',	'type' => 'text:40:0', 'explain' => true),
 				));
 			break;
 			
@@ -161,12 +163,6 @@ class acp_payments
 			trigger_error($user->lang['CONFIG_UPDATED'] . adm_back_link($this->u_action));
 		}
 
-		//Don't let them change settings if not enabled
-		
-		if ($mode !='config' && !(isset($config['pp_payment_method_'.$mode]) && $config['pp_payment_method_'.$mode]))
-		{
-			trigger_error($user->lang['PAYMENT_PORTAL_PAYMENT_NA'], E_USER_WARNING);
-		}
 		$this->tpl_name = 'acp_board';
 		$this->page_title = $display_vars['title'];
 
@@ -236,13 +232,13 @@ class acp_payments
 	function email_notification($value, $key)
 	{
 		global $user;
-        $message    = '<label><input id="' . $key . '" class="radio" type="radio"' . ($value ? ' checked="checked"' : '') . ' value="1" name="config[' . $key . ']"> ' . $user->lang['YES'];
-        $message    .='</label>';
-        $message    .='<label>';
-        $message    .= '<input class="radio" type="radio"' . (!$value ? ' checked="checked"' : '') . 'value="0" name="config[' . $key . ']"> ' . $user->lang['NO'];
-        $message    .='</label>';
-        $message    .='<input type="text" value="'. $this->new_config['pp_email_notification'] . '" name="config[pp_email_notification]" maxlength="255" size="40" id="pp_email_notification">';
-    return $message;
+		$message	= '<label><input id="' . $key . '" class="radio" type="radio"' . ($value ? ' checked="checked"' : '') . ' value="1" name="config[' . $key . ']"> ' . $user->lang['YES'];
+		$message	.='</label>';
+		$message	.='<label>';
+		$message	.= '<input class="radio" type="radio"' . (!$value ? ' checked="checked"' : '') . 'value="0" name="config[' . $key . ']"> ' . $user->lang['NO'];
+		$message	.='</label>';
+		$message	.='<input type="text" value="'. $this->new_config['pp_paypal_err_email'] . '" name="config[pp_paypal_err_email]" maxlength="255" size="40" id="pp_paypal_err_email">';
+	return $message;
 //		return '<input id="' . $key . '" type="text" size="3" maxlength="4" name="config['. $key . ']" value="' . $value . '" />&nbsp;<select name="config['. $period_basis. ']">' . '</select>';
 	}
 
@@ -252,12 +248,13 @@ class acp_payments
 	function payment_image($value, $key)
 	{
 		global $user;
-        $message    = '<label>';
-        $message    .= '<input type="text" value="' . $this->new_config['pp_image'] . ' id="' . $key . '" name="config[pp_image]"> ';
-        $message    .= '<img align="middle" src="./styles/prosilver/imageset/en/renew_membership.png">';
-        $message    .='</label>';
-    return $message;
+		$message	= '<label>';
+		$message	.= '<input type="text" value="' . $this->new_config['pp_image'] . ' id="' . $key . '" name="config[pp_image]"> ';
+		$message	.= '<img align="middle" src="./styles/prosilver/imageset/en/renew_membership.png">';
+		$message	.='</label>';
+	return $message;
 //<input type="text" value="VCHAR:20" name="config[pp_eft_image]" maxlength="255" size="40" id="pp_eft_image">
-    }
+	}
+
 }
 ?>
