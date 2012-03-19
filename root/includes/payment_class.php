@@ -52,6 +52,13 @@ class payment_class
 		
 		$this->retrieve_shopping_basket();
 	}
+
+	public function checkout()
+	{
+		$this->calc_basket_total();		
+		return;
+	}
+	
 /**
 * adds a key=>value pair to the fields array, which is what will be 
 * available to the payment class as variables.  If the value is already in the 
@@ -265,14 +272,14 @@ class payment_class
 	{
 		// Write to log
 		$fp=fopen($this->log_file,'a');
+		fwrite($fp,date('r') . ' ');
 		if (!is_array($text))
 		{
 			$text = (array) $text;						
 		}
-		fwrite($fp,date('r') . ' ');
 		foreach($text as $part_text)
 		{
-			fwrite($fp, $part_text . "\n\n");
+			fwrite($fp, $this->build_message($part_text) . "\n\n");
 		} 
 		fwrite($fp, "============\n\n");
 		fclose($fp);  // close file
@@ -321,7 +328,6 @@ class payment_class
 		{
 			$data = (array) $data;
 		}
-		ksort($data);
 		foreach ($data as $key => $value)
 		{
 			$string .= $title.$key . " = "; 

@@ -18,7 +18,7 @@ if (!defined('IN_PHPBB'))
 	$expiry_date = calc_date(-$config['ms_grace_period'], $config['ms_grace_period_basis'], time());
 
 	$sql_array = array(
-		'SELECT'    => 'u.username_clean, g.group_name, m.associate m.group_id, m.user_id',
+		'SELECT'    => 'u.username_clean, g.group_name, m.associate, m.group_id, m.user_id',
 		'FROM'      => array(
 			MEMBERSHIP_TABLE=> 'm',
 			),

@@ -66,10 +66,10 @@ class paypal_class extends payment_class
 		parent::__construct();
 		global $config, $user, $userid, $groupid, $phpEx;
 
-		$this->host		= 'api-3t.'.($config['pp_paypal_use_sandbox'] ? 'sandbox.' : '').'paypal.com';
-		$this->paypal_url  = 'https://www.'.($config['pp_paypal_use_sandbox'] ? 'sandbox.' : '').'paypal.com/cgi-bin/webscr';
+		$this->host			= 'api-3t.'.($config['pp_paypal_use_sandbox'] ? 'sandbox.' : '').'paypal.com';
+		$this->paypal_url	= 'https://www.'.($config['pp_paypal_use_sandbox'] ? 'sandbox.' : '').'paypal.com/cgi-bin/webscr';
 		
-		$this_script = generate_board_url() . "/application.$phpEx";
+		$this_script		= generate_board_url() . "/application.$phpEx";
 		
 		parent::add_field('RETURNURL', generate_board_url() . "/shopping.{$phpEx}?mode=process_payment&method=paypal&{$this->fields['PAYMENTREQUEST_0_CUSTOM']}&sid=" . $user->session_id);
 
@@ -277,7 +277,8 @@ class paypal_class extends payment_class
 		$post_string.="cmd=_notify-validate"; // append ipn command
 		
 		// open the connection to paypal
-		$fp = fsockopen($url_parsed[host],"80",$err_num,$err_str,30); 
+			$fp = fsockopen ('ssl.paypal.com', 443, $errno, $errstr, 30);			 
+//		$fp = fsockopen($url_parsed[host],443,$err_num,$err_str,30); 
 		if(!$fp)
 		{
 			 // could not open the connection.  If loggin is on, the error message
@@ -286,12 +287,13 @@ class paypal_class extends payment_class
 		}
 		else
 		{			 // Post the data back to paypal
-			 
-			fputs($fp, "POST $url_parsed[path] HTTP/1.1\r\n"); 
-			fputs($fp, "Host: $url_parsed[host]\r\n"); 
-			fputs($fp, "Content-type: application/x-www-form-urlencoded\r\n"); 
-			fputs($fp, "Content-length: ".strlen($post_string)."\r\n"); 
-			fputs($fp, "Connection: close\r\n\r\n"); 
+			// post back to PayPal system to validate 
+			$header	 = "POST $url_parsed[path] HTTP/1.1\r\n"; 
+			$header	.= "Host: $url_parsed[host]\r\n"; 
+			$header	.= "Content-type: application/x-www-form-urlencoded\r\n"; 
+			$header	.= "Content-length: ".strlen($post_string)."\r\n"; 
+
+			fputs($fp, $header . "\r\n\r\n");
 			fputs($fp, $post_string . "\r\n\r\n"); 
 			
 			// loop through the response from the server and append to variable
@@ -313,8 +315,8 @@ class paypal_class extends payment_class
 		{
 		
 			// Invalid IPN transaction.  Check the log for details.
-			write_results(array('Paypal class - Invalid IPN transaction ', $response));
-			return -1;
+			$this->write_results(array('Paypal class - Invalid IPN transaction ', $header, $response, $post_string, $url_parsed));
+			return 'fail';
 		}
 		
 	}

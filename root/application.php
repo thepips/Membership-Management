@@ -78,11 +78,11 @@ if (!empty($row['membership_no']))
 }
 else
 {
-	$sql = 'SELECT membership_no, associate_id, count(*) as stat FROM ' . MEMBERSHIP_TABLE . " WHERE group_id={$groupid} AND user_id={$userid}";
+	$sql = 'SELECT membership_no, associate_id FROM ' . MEMBERSHIP_TABLE . " WHERE group_id={$groupid} AND user_id={$userid}";
 	$result 		= $db->sql_query($sql);
 	$row 			= $db->sql_fetchrow($result);
 	$db->sql_freeresult($result);
-	$is_member 		= !empty($row['stat']);
+	$is_member 		= !empty($row);
 	$is_associate	= false;
 	$membership_no	= $row['membership_no'];
 	$associate_id	= $row['associate_id'];
@@ -472,7 +472,6 @@ switch ($mode)
 
 		$cp_data = $cp_error = array();
 		$bill = true;
-
 		if ($submit)
 		{
 			// validate custom profile fields
@@ -489,10 +488,10 @@ switch ($mode)
 			{
 				$cp->update_profile_field_data($user->data['user_id'], $cp_data);
 				// PREPARE APPLICATION FORM
-			break 2;
+				break;
 			}
 		}
-		elseif ($cp->generate_profile_fields('application', $user->get_iso_lang_id()) == 0)
+		elseif ($cp->generate_profile_fields('application', $user->get_iso_lang_id()) > 0)
 		{
 			$bill = false;
 		}

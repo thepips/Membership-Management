@@ -23,7 +23,7 @@ global $config, $phpbb_root_path, $phpEx;
 // Paypal is calling page for Express Checkout validation...
 $p = new paypal_class();
 $result = $p->validate_ipn();
-if ($result != -1) 
+if ($result != 'fail') 
 {
   
 	// IPN has been received and is verified.  
@@ -36,31 +36,29 @@ if ($result != -1)
 			// Should already be set up as subscriber
 			// but set subscriber field
 			
+			$vars_array = array(
+				'portal'			=> 'paypal', 
+				'subscriber_id'		=> $p->subscriber_id,
+			);
 			list($groupid, $userid) = explode('-',$p->fields['rp_invoice_id']);
 
 			if ((!empty($p->fields['period1']) && empty($p->fields['amount1'])) || (!empty($p->fields['period2']) && empty($p->fields['amount2'])))
 			{
 				$cleared = true; // Free trial period so effectively cleared
+				$vars_array['renewal_date'] = strtotime($p->fields['next_payment_date']);
 			}
 			else
 			{
 				$cleared = false; // no trial period specified or chargeable trial period
+				$vars_array['renewal_date'] = time(); 
 			}
 			process_payment($groupid, $userid, $cleared);
+			update_membership($groupid, $userid, $vars_array);
 
-			$sql = 'UPDATE ' . MEMBERSHIP_TABLE . '
-				SET ' . $db->sql_build_array('UPDATE', array(
-					'portal'			=> 'paypal', 
-					'subscriber_id'		=> $p->subscriber_id,
-					'renewal_date'		=> strtotime($p->fields['next_payment_date']), 
-					)) . "
-				WHERE group_id = {$groupid} AND user_id ={$userid}";
-			$db->sql_query($sql);		
-		 	$p->write_results("Paypal Subscription created for user-group {$user} - {$group}");
-			
 		break;
 
 		case 'RECURRING_PAYMENT_PROFILE_CANCEL': 			// Turn off as subscriber
+			list($groupid, $userid) = explode('-',$p->fields['rp_invoice_id']);
 			if (cancel_recurring_payment($p->fields['recurring_payment_id'], $params['g'], $params['i']))
 			{
 				$sql = 'UPDATE ' . MEMBERSHIP_TABLE . " SET subscriber_id='', portal='' WHERE group_id='{$groupid}' AND user_id='{$userid}'";
@@ -85,7 +83,7 @@ if ($result != -1)
 				// Set renewal date
 				list($groupid, $userid) = explode('-',$p->fields['rp_invoice_id']);
 				process_payment($groupid, $userid, false);
-			 	$p->write_results("Paypal recurring payment received for user-group {$params['i']} - {$params['g']}");
+			 	$p->write_results("Paypal recurring payment received for user-group {$groupid} - {$userid}");
 			}
 			set_renewal_date($groupid, $userid, (strtotime($p->fields['next_payment_date'])));
 			$db->sql_query($sql);		
@@ -123,15 +121,9 @@ if ($result != -1)
 		case 'SEND_MONEY':
 		break;
 		default:
-			dump_fields ($p, 'Unsupported Transaction Type');
+			$p->write_results(array('Unsupported Transaction type',' IPNListener  ' . $p));
 		break;
 		
 	}
-	$p->write_results(array('Unsupported Transaction type',' IPNListener  ' . $message));
 }
-else
-{
-	$p->debug(__FILE__, __LINE__, $p);
-}
-
 ?>

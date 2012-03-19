@@ -26,11 +26,11 @@ function log_message ($msg, $userid, $groupid)
 {
 	global $db;
 	$sql_array = array(
-		'SELECT'	=> 'u.username_clean, g.group_name',
-		'FROM'		=> array(
+		'SELECT'		=> 'u.username_clean, g.group_name',
+		'FROM'			=> array(
 			MEMBERSHIP_TABLE=> 'm',
 		),
-		'LEFT_JOIN' => array(
+		'LEFT_JOIN' 	=> array(
 			array(
 				'FROM'  => array(USERS_TABLE => 'u'),
 				'ON'	=> 'u.user_id = m.user_id'
@@ -40,14 +40,14 @@ function log_message ($msg, $userid, $groupid)
 				'ON'	=> 'g.group_id = m.group_id'
 			),
 		),
-		'WHERE'		=>  'm.group_id = ' . $groupid . ' AND m.user_id = '. $userid,
+		'WHERE'			=>  'm.group_id = ' . $groupid . ' AND m.user_id = '. $userid,
 	);
-	$sql=$db->sql_build_query('SELECT', $sql_array);
+	$sql		= $db->sql_build_query('SELECT', $sql_array);
 	$result		= $db->sql_query($sql);
 	$bitresult	= $db->sql_fetchrow($result);
 	$user_name	= $bitresult['username_clean'];
 	$group_name	= $bitresult['group_name'];
-	add_log('admin', $msg, $user_name,$group_name);
+	add_log('admin', $msg, $user_name, $group_name);
 }
 
 function mark_approved ($userid,$groupid)
@@ -64,7 +64,11 @@ function mark_paid ($groupid, $userid, $renewal_date='')
 	$sql_ary = array(
 		'uncleared'		=> 0,
 		'datepaid'		=> time(),
-		);
+		'remindercount'	=> 0, 
+		'reminderdate'	=> 0,
+		'remindertype'	=> 0,
+		'renewal_date'	=> $renew_until_date,
+	);
 	if ($renewal_date!='')
 	{
 		$sql_ary['renewal_date'] = $renewal_date;
@@ -315,7 +319,7 @@ function update_membership($groupid, $userid, $sql_ary)
 		$db->sql_query('INSERT ' . MEMBERSHIP_TABLE . ' ' . $db->sql_build_array('INSERT', array_merge(
 			array(
 				'user_id'			=> $userid,
-				'group_id'		=> $groupid,
+				'group_id'			=> $groupid,
 			),
 			$sql_ary
 		)));
@@ -338,11 +342,11 @@ function view_members(&$users, &$user_count, $limit = 0, $offset = 0, $sql_where
 global $db, $user, $config;
 
 	$sql_array = array(
-		'SELECT'	=> 'count(u.user_id) AS user_count',
-		'FROM'	=> array(
-			USERS_TABLE=> 'u',
+		'SELECT'		=> 'count(u.user_id) AS user_count',
+		'FROM'			=> array(
+			USERS_TABLE	=> 'u',
 		),
-		'LEFT_JOIN' => array(
+		'LEFT_JOIN' 	=> array(
 			array(
 				'FROM'  => array(MEMBERSHIP_TABLE => 'm'),
 				'ON'	=> 'm.user_id = u.user_id AND m.group_id=' . $config['ms_subscription_group']
@@ -356,10 +360,10 @@ global $db, $user, $config;
 				'ON'	=> 'ug.user_id = m.user_id AND ug.group_id=' . $config['ms_subscription_group']
 			),
 		),
-		'WHERE'		=> 'user_type=' . USER_NORMAL . $sql_where,
-		'ORDER'		=> $sort_by,
+		'WHERE'			=> 'user_type=' . USER_NORMAL . $sql_where,
+		'ORDER'			=> $sort_by,
 	);
-	$sql=$db->sql_build_query('SELECT', $sql_array);
+	$sql	= $db->sql_build_query('SELECT', $sql_array);
 	$result = $db->sql_query($sql);
 
 	$user_count = (int) $db->sql_fetchfield('user_count');

@@ -57,6 +57,11 @@ $language_file = 'mods/application';
 * The version numbering must otherwise be compatible with the version_compare function - http://php.net/manual/en/function.version-compare.php
 */
 $versions = array(
+	'0.0.20'	=> array(
+		'table_column_add' => array(
+			array(MEMBERSHIP_TABLE, 'comm_pref', array('INT:2',0)),
+		),
+	),
 	'0.0.19'	=> array(
 		'config_add' => array(
 			array('ms_default_group', '0', 0),
