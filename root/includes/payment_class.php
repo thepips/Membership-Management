@@ -53,12 +53,6 @@ class payment_class
 		$this->retrieve_shopping_basket();
 	}
 
-	public function checkout()
-	{
-		$this->calc_basket_total();		
-		return;
-	}
-	
 /**
 * adds a key=>value pair to the fields array, which is what will be 
 * available to the payment class as variables.  If the value is already in the 

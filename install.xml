@@ -19,7 +19,7 @@ Payment can be made by Cheque, EFT and Paypal using Express Checkout backed up w
         <email><![CDATA[doug@arvclub.co.uk]]></email>
       </author>
     </author-group>
-    <mod-version>0.0.21 Alpha</mod-version>
+    <mod-version>0.0.22 Alpha</mod-version>
     <installation>
       <level>intermediate</level>
       <time>1800</time>
@@ -53,7 +53,8 @@ Payment can be made by Cheque, EFT and Paypal using Express Checkout backed up w
       <file from="root/includes/paypal_class.php" to="includes/paypal_class.php" />
       <file from="root/includes/acp/acp_membership.php" to="includes/acp/acp_membership.php" />
       <file from="root/includes/acp/acp_payments.php" to="includes/acp/acp_payments.php" />
-      <file from="root/language/en/mods/application.php" to="language/en/mods/application.php" />
+      <file from="root/language/en/mods/application.php" to="language/en/mods/application.php"></file>
+      <file from="root/language/en/mods/shop.php" to="language/en/mods/shop.php" />
       <file from="root/includes/acp/acp_users_membership.php" to="includes/acp/acp_users_membership.php" />
       <file from="root/includes/acp/info/acp_membership.php" to="includes/acp/info/acp_membership.php"></file>
       <file from="root/includes/acp/info/acp_payments.php" to="includes/acp/info/acp_payments.php" />
@@ -149,8 +150,8 @@ function get_config($config_id)
       <edit>
         <find><![CDATA[			case 'register':]]></find>
         <action type="before-add"><![CDATA[			case 'application':
-                $sql_where .= " AND field_ident LIKE 'ms_%'";
-]]></action>
+				$sql_where .= " AND field_ident LIKE 'ms_%'";
+   			break;]]></action>
       </edit>
       <edit>
         <find><![CDATA[		$db->sql_freeresult($result);]]></find>
@@ -160,8 +161,8 @@ function get_config($config_id)
       <edit>
         <find><![CDATA[			case 'register':]]></find>
         <action type="before-add"><![CDATA[			case 'application':
-                $sql_where .= " AND field_ident LIKE 'ms_%'";
-]]></action>
+				$sql_where .= " AND field_ident LIKE 'ms_%'";
+   			break;]]></action>
       </edit>
     </open>
     <open src="includes/acp/acp_users.php">

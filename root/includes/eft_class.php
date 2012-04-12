@@ -29,7 +29,9 @@ class eft_class extends payment_class
 
 	public function checkout()
 	{
-		parent::preserve_shopping_basket($this->fields);
+		parent::calc_basket_total();	
+		parent::preserve_shopping_basket();
+		
 		return true;
 	}
 

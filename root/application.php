@@ -229,7 +229,7 @@ switch ($mode)
 
 	case 'billing':
 	{
-		$billing				= request_var('rb_sub_choice',0);
+		$billing				= request_var('rb_sub_choice',1);
 		$subscribing			= request_var('rb_subscription',FALSE);
 		$p->params['i']			= $userid;
 		$p->params['g']			= $groupid;
@@ -270,7 +270,7 @@ switch ($mode)
 			$p->add_subscription_item(
 				$groupid . '-' . $userid, 
 				0, 
-				sprintf($user->lang['APPLICATION_PURCHASE'] . ' Subscription', $config['ms_billing_cycle'.$billing], period_text($config['ms_billing_cycle'.$billing.'_basis'])), 
+				sprintf($user->lang['APPLICATION_PURCHASE'] . ' ' . $user->lang['SUBSCRIPTION'], $config['ms_billing_cycle'.$billing], period_text($config['ms_billing_cycle'.$billing.'_basis'])), 
 				$amount= $config['ms_billing_cycle'.$billing.'_amount'], 
 				$startdate, 
 				!($is_member), 
@@ -487,8 +487,6 @@ switch ($mode)
 			else
 			{
 				$cp->update_profile_field_data($user->data['user_id'], $cp_data);
-				// PREPARE APPLICATION FORM
-				break;
 			}
 		}
 		elseif ($cp->generate_profile_fields('application', $user->get_iso_lang_id()) > 0)

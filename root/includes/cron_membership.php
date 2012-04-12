@@ -16,9 +16,10 @@ if (!defined('IN_PHPBB'))
     }
 
 	$expiry_date = calc_date(-$config['ms_grace_period'], $config['ms_grace_period_basis'], time());
+	$delete_members = array();
 
 	$sql_array = array(
-		'SELECT'    => 'u.username_clean, g.group_name, m.associate, m.group_id, m.user_id',
+		'SELECT'    => 'u.username_clean, g.group_name, m.associate_id, m.group_id, m.user_id',
 		'FROM'      => array(
 			MEMBERSHIP_TABLE=> 'm',
 			),
@@ -55,7 +56,7 @@ if (!defined('IN_PHPBB'))
 	$due_date[3] = calc_date(-$config['ms_overdue_period'], $config['ms_overdue_period_basis']);		// looking for anything with a renewal date prior to today + 1d
 	$due_date[4] = calc_date(-$config['ms_last_chance_period'], $config['ms_last_chance_period_basis']);// looking for anything with a renewal date prior to today - 1m
 	$sql_array = array(
-		'SELECT'    => 'm.*, u.user_id, u.username_clean, u.user_email, u.user_lang, u.user_jabber, u.user_notify_type, u.user_regdate, u.user_actkey, pfd.pf_realname, g.group_name',
+		'SELECT'    => 'm.*, u.user_id, u.username_clean, u.user_email, u.user_lang, u.user_jabber, u.user_notify_type, u.user_regdate, u.user_actkey, g.group_name',
 		'FROM'      => array(
 			MEMBERSHIP_TABLE=> 'm',
 			),
@@ -68,10 +69,6 @@ if (!defined('IN_PHPBB'))
 				'FROM'  => array(GROUPS_TABLE => 'g'),
 				'ON'    => 'g.group_id = m.group_id'
 				),
-			array(
-				'FROM'  => array(PROFILE_FIELDS_DATA_TABLE => 'pfd'),
-				'ON'    => ('pfd.user_id = u.user_id'),
-			),
 		),
 	);
 
@@ -103,6 +100,7 @@ if (!defined('IN_PHPBB'))
 				$messenger->headers('X-AntiAbuse: User_id - ' . $user->data['user_id']);
 				$messenger->headers('X-AntiAbuse: Username - ' . $user->data['username']);
 				$messenger->headers('X-AntiAbuse: User IP - ' . $user->ip);
+
 
 				$messenger->assign_vars(array(
 					'USERNAME'		=> htmlspecialchars_decode($row['username']),

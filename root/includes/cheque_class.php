@@ -32,7 +32,9 @@ class cheque_class extends payment_class
 
 	public function checkout()
 	{
+		parent::calc_basket_total();	
 		parent::preserve_shopping_basket();
+		
 		return true;
 	}
 

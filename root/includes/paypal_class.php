@@ -255,7 +255,7 @@ class paypal_class extends payment_class
 
 	private function validate_response($result)
 	{
-			$response = $result->get_content();
+		$response = $result->get_content();
 		$this->EC_data = $this->parse_response($this->response);
 		return ($this->EC_data['ACK'] == 'Success');
 	}
@@ -322,8 +322,8 @@ class paypal_class extends payment_class
 	}
 	private function log_ipn($table_name, $txn_id, $ipn_data)
 	{
-		if ($this->fields['txn_type']=='recurring_payment_profile_created' ||
-			$this->fields['txn_type']=='recurring_payment_profile_cancel'
+		if ($this->fields['txn_type'] == 'recurring_payment_profile_created' ||
+			$this->fields['txn_type'] == 'recurring_payment_profile_cancel'
 			)
 		{
 			return -1;
@@ -340,8 +340,9 @@ class paypal_class extends payment_class
 			return $db->sql_nextid();
 		}
 		else
+		{
 			return 0;	
-
+		}
 	}
  
 }

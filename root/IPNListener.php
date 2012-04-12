@@ -15,7 +15,8 @@ $user->session_begin();
 
 include($phpbb_root_path . 'includes/functions_posting.' . $phpEx);
 include($phpbb_root_path . 'includes/functions_membership.' . $phpEx);
-include($phpbb_root_path . 'includes/paypal_class.' . $phpEx);  // include the class file
+include($phpbb_root_path . 'includes/functions_user.' . $phpEx);			// required for group_user_del
+include($phpbb_root_path . 'includes/paypal_class.' . $phpEx);  			// include the class file
 
 global $db, $user, $auth, $template;
 global $config, $phpbb_root_path, $phpEx;

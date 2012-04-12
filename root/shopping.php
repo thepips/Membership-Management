@@ -19,7 +19,7 @@ include($phpbb_root_path . 'includes/currency_format.' . $phpEx);
 // Start session management
 $user->session_begin();
 $auth->acl($user->data);
-$user->setup('mods/shop');
+$user->setup(array('mods/shop','mods/application'));
 
 global $db, $user, $auth, $template;
 global $config, $phpbb_root_path, $phpEx;
@@ -122,7 +122,7 @@ switch ($mode)
 		$action	= request_var('action', '');
 		if ($action!='returning')
 		{
-			$amounts = request_var('amt',array('' => 0.00));
+			$amounts 	= request_var('amt',array('' => 0.00));
 			$quantities = request_var('qty',array('' => 0.00));
 
 			for ($num=0;$num<10; $num++)
@@ -243,7 +243,7 @@ switch ($mode)
 	{
 		if (!empty($p->fields["PAYMENTREQUEST_0_CURRENCYCODE{$num}"]))
 		{
-			$quantities[$num]		= $p->fields["PAYMENTREQUEST_0_QTY{$num}"];
+			$quantities[$num]	= $p->fields["PAYMENTREQUEST_0_QTY{$num}"];
 			$amounts[$num]		= sprintf("%01.2f",$p->fields["PAYMENTREQUEST_0_AMT{$num}"]); 
 		}
 	}
@@ -251,19 +251,27 @@ switch ($mode)
 	{
 		if (!empty($p->fields["PAYMENTREQUEST_0_CURRENCYCODE{$num}"]))
 		{
-			$quantities	= $p->fields["PAYMENTREQUEST_0_QTY{$num}"];
-			$amounts	= $p->fields["PAYMENTREQUEST_0_AMT{$num}"]; 
-			$line_total = $quantities * $amounts;
-			$grand_total += $line_total;
+			$quantities		= $p->fields["PAYMENTREQUEST_0_QTY{$num}"];
+			$amounts		= $p->fields["PAYMENTREQUEST_0_AMT{$num}"]; 
+			$line_total 	= $quantities * $amounts;
+			$amounts		= currency_format($amounts);
+			$item_desc 		= $p->fields["PAYMENTREQUEST_0_DESC{$num}"];
+			if (!empty($p->fields['INITAMT']))
+			{
+				$item_desc	= $user->lang['INITIAL_FEE'] . '<br />' . $item_desc;
+				$line_total	+= $p->fields['INITAMT'];
+				$amounts	= currency_format($p->fields['INITAMT']) . '<br />' . $amounts;
+			}
+			$grand_total 	+= $line_total;
 			$template->assign_block_vars('batch', array(
 				'DELETE'						=> append_sid("{$phpbb_root_path}shopping.$phpEx","&mode=delete&type=cart&billing={$num}"),
 				'FIXED_QTY'						=> $p->fields["PAYMENTREQUEST_0_QTY{$num}"],
 				'PAYMENT_REQUEST_QTY'			=> $quantities,
 				'QTY_STYLE'						=> $qty_error[$num] ? 'error' : 'ok',
-				'PAYMENT_REQUEST_DESC'			=> $p->fields["PAYMENTREQUEST_0_DESC{$num}"],
+				'PAYMENT_REQUEST_DESC'			=> $item_desc,
 				'FIXED_AMT'						=> $p->fields["PAYMENTREQUEST_0_AMT{$num}"]>0,
 				'AMT_STYLE'						=> $amt_error[$num] ? 'wrong' : 'ok',
-				'PAYMENT_REQUEST_AMT'			=> currency_format($amounts), 
+				'PAYMENT_REQUEST_AMT'			=> $amounts, 
 				'PAYMENT_REQUEST_CURRENCYCODE'  => $p->fields["PAYMENTREQUEST_0_CURRENCYCODE{$num}"],
 				'PAYMENT_REQUEST_LINE_TOTAL'	=> currency_format($line_total),
 			));
