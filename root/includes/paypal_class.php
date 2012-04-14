@@ -114,7 +114,7 @@ class paypal_class extends payment_class
 		{
 			$this->failed(__FILE__, __LINE__, $this);
 			trigger_error('your session has expired');
-			return false;
+			return -1;
 		}
 		else
 		{
@@ -147,7 +147,7 @@ class paypal_class extends payment_class
 		if (!$this->process_request($this->fields))
 		{
 			$this->failed(__FILE__, __LINE__, $this);
-			return false;
+			return 'failed';
 		}
 		else
 		{
@@ -155,7 +155,7 @@ class paypal_class extends payment_class
 			{
 				$this->subscriber_id = $this->EC_data['PROFILEID'];
 			}
-			return true;
+			return false;
 		}
 	}
 

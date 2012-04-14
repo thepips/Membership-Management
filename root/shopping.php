@@ -210,11 +210,12 @@ switch ($mode)
 			break;
 		}
 	case 'process_payment':
-		if (!$p->take_payment())
+		$uncleared = $p->take_payment())
+		if ($uncleared == 'expired' || $uncleared == 'failed')		
 		{
 			redirect(append_sid("{$phpbb_root_path}index.$phpEx"));
 		}
-		redirect(append_sid("{$phpbb_root_path}{$p->params['return']}.$phpEx", "&mode=paid&{$p->fields['PAYMENTREQUEST_0_CUSTOM']}"));
+		redirect(append_sid("{$phpbb_root_path}{$p->params['return']}.$phpEx", "&mode=paid&status=$uncleared&{$p->fields['PAYMENTREQUEST_0_CUSTOM']}"));
 	break;
 
 	case 'delete':

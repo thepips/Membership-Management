@@ -26,27 +26,5 @@ class eft_class extends payment_class
 
 		$this->last_error = '';
    }
-
-	public function checkout()
-	{
-		parent::calc_basket_total();	
-		parent::preserve_shopping_basket();
-		
-		return true;
-	}
-
-	public function take_payment()
-	{
-		parent::retrieve_shopping_basket();
-		if ($this->fields==null)
-		{
-			trigger_error("I'm sorry but your session has expired");
-			return false;
-		}
-		$this->subscriber_id='EFT';
-		parent::remove_shopping_basket();
-		return true;
-	}
-
 }
 ?>

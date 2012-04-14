@@ -74,7 +74,7 @@ if (!defined('IN_PHPBB'))
 
 	foreach($due_date as $key => $action_date)
 	{
-		$sql_array['WHERE']=  " m.renewal_date <= {$action_date} AND reminder_type < {$key}";
+		$sql_array['WHERE']=  " m.renewal_date <= {$action_date} AND remindertype < {$key}";
 		$sql=$db->sql_build_query('SELECT', $sql_array);
 		$result = $db->sql_query($sql);
 

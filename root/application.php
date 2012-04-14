@@ -240,7 +240,7 @@ switch ($mode)
 
 		if (!$subscribing)
 		{
-			if (!$is_member)
+			if (!$is_member && !empty($config['ms_group_join_amount']))
 			{
 				$p->add_cart_item(null , $user->lang['INITIAL_FEE'],$config['ms_group_join_amount']);
 			}
@@ -251,8 +251,6 @@ switch ($mode)
 				$message .= ' ' . $user->lang['DONATION'];
 			}
 			$p->add_cart_item(null , $message, $amount);
-			
-			update_membership($groupid, $userid, array('billing'=>$billing));
 		}
 		else
 		{
@@ -285,13 +283,15 @@ switch ($mode)
 	
 	case 'paid':
 	{
+		$uncleared = request_var('status', $config['ms_process_on_payment'];
+		process_payment($groupid, $userid, $uncleared);
 		if (!$is_member)
 		{
 			if ($config['ms_application_forum'])
 			{
 				// NEW APPLICATION SO WE CAN NOW POST TO FORUM
 				$sql_array = array(
-					'SELECT'		=> 'u.username_clean, pfd.*, g.group_name',
+				'SELECT'    => 'u.username_clean, pfd.*, m.associate_id, m.group_id, m.user_id',
 					'FROM'			=> array(
 						MEMBERSHIP_TABLE=> 'm',
 						),
@@ -299,14 +299,14 @@ switch ($mode)
 						array(
 							'FROM'  => array(USERS_TABLE => 'u'),
 							'ON'	=> 'u.user_id = m.user_id'
+						),
+					array(
+						'FROM'  => array(GROUPS_TABLE => 'g'),
+						'ON'    => 'g.group_id = m.group_id'
 							),
 						array(
 							'FROM'  => array(PROFILE_FIELDS_DATA_TABLE => 'pfd'),
 							'ON'	=> 'pfd.user_id = m.user_id'
-							),
-						array(
-							'FROM'  => array(GROUPS_TABLE => 'g'),
-							'ON'	=> 'g.group_id = m.group_id'
 							),
 						),
 					'WHERE'			=>  'm.user_id = '. $userid . ' AND m.group_id = '. $groupid,
@@ -314,11 +314,11 @@ switch ($mode)
 				$sql=$db->sql_build_query('SELECT', $sql_array);
 				$result = $db->sql_query($sql);
 				$row = $db->sql_fetchrow($result);
-				
-				$cpfs = list_cpf();
 
 				$apply_subject  = sprintf($user->lang['APPLICATION_SUBJECT'], $row['username_clean']);
 				$apply_post	= sprintf($user->lang['APPLICATION_MESSAGE'], $row['username_clean'],$row['group_name']);
+
+				$cpfs = list_cpf();
 
 				foreach ($cpfs as $cpf)
 				{
@@ -362,7 +362,7 @@ switch ($mode)
 				submit_post('post', $apply_subject, '', POST_NORMAL, $poll, $data);
 			}
 		}
-		process_payment($groupid, $userid, true);
+
 	
 		// Thank you message goes here
 		page_header($user->lang['PAYMENT_PAGE_TITLE']);
@@ -489,14 +489,18 @@ switch ($mode)
 				$cp->update_profile_field_data($user->data['user_id'], $cp_data);
 			}
 		}
-		elseif ($cp->generate_profile_fields('application', $user->get_iso_lang_id()) > 0)
+		else
+		{
+		    $user->get_profile_fields($user->data['user_id']);		
+			$num_cpfs = $cp->generate_profile_fields('application', $user->get_iso_lang_id());
+			if ($num_cpfs > 0)
 		{
 			$bill = false;
 		}
-		
+		}
 		if ($bill)
 		{
-			present_billing_cycle();
+			present_billing_cycle(); // Select subscription period and charge
 			$template->assign_vars(array(
 				'S_ACTION'		=> append_sid("{$phpbb_root_path}application.$phpEx","mode=billing&i={$userid}&g={$groupid}&r={$in_registration}"),
 				'GIVE_OPTION'	=> !$in_registration,

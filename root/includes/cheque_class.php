@@ -30,26 +30,5 @@ class cheque_class extends payment_class
 		$this->last_error = '';
    }
 
-	public function checkout()
-	{
-		parent::calc_basket_total();	
-		parent::preserve_shopping_basket();
-		
-		return true;
-	}
-
-	public function take_payment()
-	{
-		parent::retrieve_shopping_basket();
-		if ($this->fields==null)
-		{
-			trigger_error('your session has expired');
-			return false;
-		}
-
-		parent::remove_shopping_basket();
-		return true;
-	}
-
 }
 ?>

@@ -19,7 +19,7 @@ Payment can be made by Cheque, EFT and Paypal using Express Checkout backed up w
         <email><![CDATA[doug@arvclub.co.uk]]></email>
       </author>
     </author-group>
-    <mod-version>0.0.22 Alpha</mod-version>
+    <mod-version>0.0.23 Alpha</mod-version>
     <installation>
       <level>intermediate</level>
       <time>1800</time>
@@ -195,7 +195,15 @@ function get_config($config_id)
         <find><![CDATA[				$message = $message . '<br /><br />' . sprintf($user->lang['RETURN_INDEX'], '<a href="' . append_sid("{$phpbb_root_path}index.$phpEx") . '">', '</a>');]]></find>
         <action type="replace-with"><![CDATA[				if ($premium_sub_option==1)
 				{
-					$message = $message . '<br /><br />' . sprintf($user->lang['CONTINUE_APPLICATION'], '<a href="' . append_sid("{$phpbb_root_path}application.$phpEx","mode=apply&member=1&r=1&i={$user_id}&g={$config['ms_subscription_group']}") . '">', '</a>');
+					$auth->login($data['username'], $data['new_password']);
+					if (empty($user->lang['CONTINUE_APPLICATION']))
+					{
+						redirect(append_sid("{$phpbb_root_path}application.$phpEx","mode=apply&member=1&r=1&i={$user_id}&g={$config['ms_subscription_group']}"));
+					}
+					else
+					{
+						$message = sprintf($user->lang['CONTINUE_APPLICATION'], '<a href="' . append_sid("{$phpbb_root_path}application.$phpEx","mode=apply&member=1&r=1&i={$user_id}&g={$config['ms_subscription_group']}") . '">', '</a>');
+					}
 				}
 				else
 				{
@@ -204,7 +212,8 @@ function get_config($config_id)
 						redirect(append_sid("{$phpbb_root_path}application.$phpEx","mode=apply&member=1&r=1&i={$user_id}&g={$config['ms_subscription_group']}"));
 					}
 					$message = $message . '<br /><br />' . sprintf($user->lang['RETURN_INDEX'], '<a href="' . append_sid("{$phpbb_root_path}index.$phpEx") . '">', '</a>');
-				}]]></action>
+				}
+				trigger_error($message);]]></action>
       </edit>
       <edit>
         <find><![CDATA[			'S_UCP_ACTION'		=> append_sid("{$phpbb_root_path}ucp.$phpEx", 'mode=register'),]]></find>
