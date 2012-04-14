@@ -283,7 +283,7 @@ switch ($mode)
 	
 	case 'paid':
 	{
-		$uncleared = request_var('status', $config['ms_process_on_payment'];
+		$uncleared = request_var('status', $config['ms_process_on_payment']);
 		process_payment($groupid, $userid, $uncleared);
 		if (!$is_member)
 		{
