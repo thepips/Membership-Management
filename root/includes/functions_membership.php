@@ -320,6 +320,7 @@ function update_membership($groupid, $userid, $sql_ary)
 			array(
 				'user_id'			=> $userid,
 				'group_id'			=> $groupid,
+				'last_renewal_date'	=> 0,
 			),
 			$sql_ary
 		)));
