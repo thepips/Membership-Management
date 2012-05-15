@@ -19,7 +19,7 @@ include($phpbb_root_path . 'includes/currency_format.' . $phpEx);
 // Start session management
 $user->session_begin();
 $auth->acl($user->data);
-$user->setup(array('mods/shop','mods/application'));
+$user->setup(array('mods/shopping'));
 
 global $db, $user, $auth, $template;
 global $config, $phpbb_root_path, $phpEx;
@@ -209,13 +209,13 @@ switch ($mode)
 			}
 			break;
 		}
+		$return = $p->take_payment();
 	case 'process_payment':
-		$uncleared = $p->take_payment())
-		if ($uncleared == 'expired' || $uncleared == 'failed')		
+		if ($return == 'expired' || $return == 'failed')		
 		{
 			redirect(append_sid("{$phpbb_root_path}index.$phpEx"));
 		}
-		redirect(append_sid("{$phpbb_root_path}{$p->params['return']}.$phpEx", "&mode=paid&status={$uncleared}&{$p->fields['PAYMENTREQUEST_0_CUSTOM']}"));
+		redirect(append_sid("{$phpbb_root_path}{$p->params['return']}.$phpEx", "&mode=paid&status=0&{$p->fields['PAYMENTREQUEST_0_CUSTOM']}"));
 	break;
 
 	case 'delete':
