@@ -209,8 +209,8 @@ switch ($mode)
 			}
 			break;
 		}
-		$return = $p->take_payment();
 	case 'process_payment':
+		$return = $p->take_payment();
 		if ($return == 'expired' || $return == 'failed')		
 		{
 			redirect(append_sid("{$phpbb_root_path}index.$phpEx"));

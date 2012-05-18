@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <?xml-stylesheet type="text/xsl" href="modx.prosilver.en.xsl"?>
 <!--NOTICE: Please open this file in your web browser. If presented with a security warning, you may safely tell it to allow the blocked content.-->
 <!--For security purposes, please check: http://www.phpbb.com/mods/ for the latest version of this MOD.\nAlthough MODs are checked before being allowed in the MODs Database there is no guarantee that there are no security problems within the MOD.\nNo support will be given for MODs not found within the MODs Database which can be found at http://www.phpbb.com/mods/-->
@@ -19,7 +19,7 @@ Payment can be made by Cheque, EFT and Paypal using Express Checkout backed up w
         <email><![CDATA[doug@arvclub.co.uk]]></email>
       </author>
     </author-group>
-    <mod-version>0.0.23 Alpha</mod-version>
+    <mod-version>0.0.24 Alpha</mod-version>
     <installation>
       <level>intermediate</level>
       <time>1800</time>
@@ -60,6 +60,7 @@ Payment can be made by Cheque, EFT and Paypal using Express Checkout backed up w
       <file from="root/includes/acp/info/acp_payments.php" to="includes/acp/info/acp_payments.php" />
       <file from="root/language/en/mods/info_acp_membership.php" to="language/en/mods/info_acp_membership.php" />
       <file from="root/language/en/mods/info_acp_payments.php" to="language/en/mods/info_acp_payments.php" />
+      <file from="root/language/en/mods/shopping.php" to="language/en/mods/shopping.php" />
       <file from="root/styles/prosilver/template/appform_body.html" to="styles/prosilver/template/appform_body.html" />
       <file from="root/styles/prosilver/template/make_payment.html" to="styles/prosilver/template/make_payment.html" />
       <file from="root/styles/prosilver/template/membership_details.html" to="styles/prosilver/template/membership_details.html" />
@@ -136,6 +137,10 @@ function get_config($config_id)
       <edit>
         <find><![CDATA[		'L_ONLINE_EXPLAIN'	=> $l_online_time,]]></find>
         <action type="after-add"><![CDATA[		'U_MEMBERSHIP'			=> append_sid("{$phpbb_root_path}application.$phpEx"),    ]]></action>
+      </edit>
+      <edit>
+        <find><![CDATA[		'S_DISPLAY_MEMBERLIST'	=> (isset($auth)) ? $auth->acl_get('u_viewprofile') : 0,]]></find>
+        <action type="after-add"><![CDATA[		'S_DISPLAY_MEMBERSHIP'	=> ($config['ms_enable_membership']),]]></action>
       </edit>
       <edit>
         <find>			$cron_type = 'tidy_sessions';</find>
@@ -287,7 +292,7 @@ function get_config($config_id)
         <find><![CDATA[					<!-- IF S_DISPLAY_MEMBERLIST --><li class="icon-members"><a href="{U_MEMBERLIST}" title="{L_MEMBERLIST_EXPLAIN}">{L_MEMBERLIST}</a></li><!-- ENDIF -->]]></find>
         <inline-edit>
           <inline-find><![CDATA[<!-- ENDIF -->]]></inline-find>
-          <inline-action type="before-add"><![CDATA[<li class="icon-members"><a href="{U_MEMBERSHIP}" title="{L_MEMBERSHIP_EXPLAIN}">{L_MEMBERSHIP}</a></li>]]></inline-action>
+          <inline-action type="after-add"><![CDATA[<!-- IF S_DISPLAY_MEMBERSHIP --><li class="icon-members"><a href="{U_MEMBERSHIP}" title="{L_MEMBERSHIP_EXPLAIN}">{L_MEMBERSHIP}</a></li><!-- ENDIF -->]]></inline-action>
         </inline-edit>
       </edit>
     </open>
