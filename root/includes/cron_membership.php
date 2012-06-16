@@ -121,7 +121,7 @@ if (!defined('IN_PHPBB'))
 			foreach ($user_ids as $user_id)
 			{
 				$sql = 'UPDATE ' . MEMBERSHIP_TABLE . 
-				' SET remindercount = remindercount + 1, reminderdate = ' . time() . ' remindertype = ' . $key . ' WHERE user_id=' . $user_id . ' AND m.group_id=' . $config['ms_subscription_group'];
+				' SET remindercount = remindercount + 1, reminderdate = ' . time() . ', remindertype = ' . $key . ' WHERE user_id=' . $user_id . ' AND m.group_id=' . $config['ms_subscription_group'];
 				$result = $db->sql_query($sql);
 				$affected_rows =$db->sql_affectedrows();
 				if ($affected_rows == 0)
