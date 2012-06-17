@@ -210,7 +210,7 @@ switch ($mode)
 			break;
 		}
 	case 'process_payment':
-		$uncleared = $p->take_payment())
+		$uncleared = $p->take_payment();
 		if ($uncleared == 'expired' || $uncleared == 'failed')		
 		{
 			redirect(append_sid("{$phpbb_root_path}index.$phpEx"));
