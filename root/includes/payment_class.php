@@ -264,8 +264,8 @@ class payment_class
 
 	public function checkout()
 	{
-		parent::calc_basket_total();	
-		parent::preserve_shopping_basket();
+		$this->calc_basket_total();
+		$this->preserve_shopping_basket();
 		
 		return true;
 	}
@@ -273,13 +273,13 @@ class payment_class
 	public function take_payment()
 	{
 		global $config;
-		parent::retrieve_shopping_basket();
+		$this->retrieve_shopping_basket();
 		if ($this->fields==null)
 		{
 			trigger_error("I'm sorry but your session has expired");
 			return 'expired';
 		}
-		parent::remove_shopping_basket();
+		$this->remove_shopping_basket();
 		return $config['ms_process_on_payment'];
 	}
 

@@ -130,9 +130,45 @@ class acp_payments
 		// We validate the complete config if whished
 		validate_config_vars($display_vars['vars'], $cfg_array, $error);
 
-		if ($submit && !check_form_key($form_key))
+		if ( $submit )
 		{
-			$error[] = $user->lang['FORM_INVALID'];
+			if ( !check_form_key($form_key))
+			{
+				$error[] = $user->lang['FORM_INVALID'];
+			}
+			if ( $mode = 'paypal' )
+			{
+				if ($cfg_array['pp_paypal_use_sandbox'])
+				{
+					if (empty($cfg_array['pp_paypal_sandbox_API_username']))
+					{
+						$error[]='API Username required for Sandbox';
+					}
+					if (empty($cfg_array['pp_paypal_sandbox_API_password']))
+					{
+						$error[]='API password required for Sandbox';
+					}
+					if (empty($cfg_array['pp_paypal_sandbox_API_signature']))
+					{
+						$error[]='API signature required for Sandbox';
+					}
+				}
+				else
+				{
+					if (empty($cfg_array['pp_paypal_API_username']))
+					{
+						$error[]='API Username required';
+					}
+					if (empty($cfg_array['pp_paypal_API_password']))
+					{
+						$error[]='API password required';
+					}
+					if (empty($cfg_array['pp_paypal_API_signature']))
+					{
+						$error[]='API signature required';
+					}
+				}
+			}
 		}
 		// Do not write values if there is an error
 		if (sizeof($error))

@@ -75,7 +75,7 @@ if ($action == 'x')
 switch ($mode)
 {
 	case 'add_to_cart';
-
+	{
 		$topic_id=request_var('t', 0);
 		$sql_array = array(
 			'SELECT'		=> 'p.*, t.*',
@@ -116,9 +116,11 @@ switch ($mode)
 		$p->params['f']		= request_var('f',0);
 
 		$p->add_cart_item(null , $message, $price, 1);
+	}
 	break;
 
 	case 'payment':
+	{
 		$action	= request_var('action', '');
 		if ($action!='returning')
 		{
@@ -209,16 +211,20 @@ switch ($mode)
 			}
 			break;
 		}
+	}
 	case 'process_payment':
+	{
 		$return = $p->take_payment();
 		if ($return == 'expired' || $return == 'failed')		
 		{
 			redirect(append_sid("{$phpbb_root_path}index.$phpEx"));
 		}
-		redirect(append_sid("{$phpbb_root_path}{$p->params['return']}.$phpEx", "&mode=paid&status=0&{$p->fields['PAYMENTREQUEST_0_CUSTOM']}"));
+		redirect(append_sid("{$phpbb_root_path}{$p->params['return']}.$phpEx", "&mode=paid&status={$return}&{$p->fields['PAYMENTREQUEST_0_CUSTOM']}"));
+	}
 	break;
 
 	case 'delete':
+	{
 		$type	= request_var('type', '');
 		$billing= request_var('billing', '');
 		if (confirm_box(true))
@@ -236,86 +242,87 @@ switch ($mode)
 		{
 			confirm_box(false, 'DELETE_LINE');
 		}
+	}
 	case 'checkout':
 	default:
 	break;
 }
-	for ($num=0; $num<10; $num++)
+for ($num=0; $num<10; $num++)
+{
+	if (!empty($p->fields["PAYMENTREQUEST_0_CURRENCYCODE{$num}"]))
 	{
-		if (!empty($p->fields["PAYMENTREQUEST_0_CURRENCYCODE{$num}"]))
-		{
-			$quantities[$num]	= $p->fields["PAYMENTREQUEST_0_QTY{$num}"];
-			$amounts[$num]		= sprintf("%01.2f",$p->fields["PAYMENTREQUEST_0_AMT{$num}"]); 
-		}
+		$quantities[$num]	= $p->fields["PAYMENTREQUEST_0_QTY{$num}"];
+		$amounts[$num]		= sprintf("%01.2f",$p->fields["PAYMENTREQUEST_0_AMT{$num}"]); 
 	}
-	for ($grand_total=0, $num=0; $num<10; $num++)
+}
+for ($grand_total=0, $num=0; $num<10; $num++)
+{
+	if (!empty($p->fields["PAYMENTREQUEST_0_CURRENCYCODE{$num}"]))
 	{
-		if (!empty($p->fields["PAYMENTREQUEST_0_CURRENCYCODE{$num}"]))
+		$quantities		= $p->fields["PAYMENTREQUEST_0_QTY{$num}"];
+		$amounts		= $p->fields["PAYMENTREQUEST_0_AMT{$num}"]; 
+		$line_total 	= $quantities * $amounts;
+		$amounts		= currency_format($amounts);
+		$item_desc 		= $p->fields["PAYMENTREQUEST_0_DESC{$num}"];
+		if (!empty($p->fields['INITAMT']))
 		{
-			$quantities		= $p->fields["PAYMENTREQUEST_0_QTY{$num}"];
-			$amounts		= $p->fields["PAYMENTREQUEST_0_AMT{$num}"]; 
-			$line_total 	= $quantities * $amounts;
-			$amounts		= currency_format($amounts);
-			$item_desc 		= $p->fields["PAYMENTREQUEST_0_DESC{$num}"];
-			if (!empty($p->fields['INITAMT']))
-			{
-				$item_desc	= $user->lang['INITIAL_FEE'] . '<br />' . $item_desc;
-				$line_total	+= $p->fields['INITAMT'];
-				$amounts	= currency_format($p->fields['INITAMT']) . '<br />' . $amounts;
-			}
-			$grand_total 	+= $line_total;
-			$template->assign_block_vars('batch', array(
-				'DELETE'						=> append_sid("{$phpbb_root_path}shopping.$phpEx","&mode=delete&type=cart&billing={$num}"),
-				'FIXED_QTY'						=> $p->fields["PAYMENTREQUEST_0_QTY{$num}"],
-				'PAYMENT_REQUEST_QTY'			=> $quantities,
-				'QTY_STYLE'						=> $qty_error[$num] ? 'error' : 'ok',
-				'PAYMENT_REQUEST_DESC'			=> $item_desc,
-				'FIXED_AMT'						=> $p->fields["PAYMENTREQUEST_0_AMT{$num}"]>0,
-				'AMT_STYLE'						=> $amt_error[$num] ? 'wrong' : 'ok',
-				'PAYMENT_REQUEST_AMT'			=> $amounts, 
-				'PAYMENT_REQUEST_CURRENCYCODE'  => $p->fields["PAYMENTREQUEST_0_CURRENCYCODE{$num}"],
-				'PAYMENT_REQUEST_LINE_TOTAL'	=> currency_format($line_total),
-			));
+			$item_desc	= $user->lang['INITIAL_FEE'] . '<br />' . $item_desc;
+			$line_total	+= $p->fields['INITAMT'];
+			$amounts	= currency_format($p->fields['INITAMT']) . '<br />' . $amounts;
 		}
+		$grand_total 	+= $line_total;
+		$template->assign_block_vars('batch', array(
+			'DELETE'						=> append_sid("{$phpbb_root_path}shopping.$phpEx","&mode=delete&type=cart&billing={$num}"),
+			'FIXED_QTY'						=> $p->fields["PAYMENTREQUEST_0_QTY{$num}"],
+			'PAYMENT_REQUEST_QTY'			=> $quantities,
+			'QTY_STYLE'						=> $qty_error[$num] ? 'error' : 'ok',
+			'PAYMENT_REQUEST_DESC'			=> $item_desc,
+			'FIXED_AMT'						=> $p->fields["PAYMENTREQUEST_0_AMT{$num}"]>0,
+			'AMT_STYLE'						=> $amt_error[$num] ? 'wrong' : 'ok',
+			'PAYMENT_REQUEST_AMT'			=> $amounts, 
+			'PAYMENT_REQUEST_CURRENCYCODE'  => $p->fields["PAYMENTREQUEST_0_CURRENCYCODE{$num}"],
+			'PAYMENT_REQUEST_LINE_TOTAL'	=> currency_format($line_total),
+		));
 	}
-	$template->assign_vars(array(
-		'DISPLAY_ERROR'		=> sizeof($error)>0 ? 'form_error' : 'form_ok',
-		'ERROR_MSG'			=> implode('<br />', $error),
-		'S_ACTION'			=> append_sid("{$phpbb_root_path}shopping.$phpEx", "mode=payment&ref={$ref}"),
-		'GRAND_TOTAL'		=> currency_format($grand_total),
-	));
+}
+$template->assign_vars(array(
+	'DISPLAY_ERROR'		=> sizeof($error)>0 ? 'form_error' : 'form_ok',
+	'ERROR_MSG'			=> implode('<br />', $error),
+	'S_ACTION'			=> append_sid("{$phpbb_root_path}shopping.$phpEx", "mode=payment&ref={$ref}"),
+	'GRAND_TOTAL'		=> currency_format($grand_total),
+));
 
-	// build the payment methods
-	
-	foreach($config as $config_name=>$config_value)
+// build the payment methods
+
+foreach($config as $config_name=>$config_value)
+{
+	if (substr($config_name,0,18) == 'pp_payment_method_' && $config_value)
 	{
-		if (substr($config_name,0,18) == 'pp_payment_method_' && $config_value)
+		$payment_type = trim(substr($config_name,18));
+		if (isset($subscriber) && (!$config['pp_subscription_allowed_' . $payment_type]))
 		{
-			$payment_type = trim(substr($config_name,18));
-			if (isset($subscriber) && (!$config['pp_subscription_allowed_' . $payment_type]))
-			{
-				continue;
-			}
-			$payment_method=strtoupper($config_name);
-			if (empty($config['pp_'.$payment_type.'_image']))
-			{
-				$payment_image  = 'standard';
-			}
-			else
-			{
-				$payment_image  = $config['pp_'.$payment_type.'_image'];
-			}
+			continue;
+		}
+		$payment_method=strtoupper($config_name);
+		if (empty($config['pp_'.$payment_type.'_image']))
+		{
+			$payment_image  = 'standard';
+		}
+		else
+		{
+			$payment_image  = $config['pp_'.$payment_type.'_image'];
+		}
 //			$sizes=getimagesize($payment_image);
-			$template->assign_block_vars('pp_payment_methods', array(
-				'NAME'			=> $payment_type,
-				'LABEL'			=> $user->lang[$payment_method],
-				'EXPLAIN'		=> $user->lang[$payment_method . '_EXPLAIN'],
-				'PAYMENT_IMAGE' => $payment_image,
+		$template->assign_block_vars('pp_payment_methods', array(
+			'NAME'			=> $payment_type,
+			'LABEL'			=> $user->lang[$payment_method],
+			'EXPLAIN'		=> $user->lang[$payment_method . '_EXPLAIN'],
+			'PAYMENT_IMAGE' => $payment_image,
 //				'IMAGE_WIDTH'   => $sizes[0],
 //				'IMAGE_HEIGHT'   => $sizes[1],
-			));
-		}
+		));
 	}
+}
 
 page_footer();
 ?>

@@ -87,7 +87,7 @@ function mark_paid ($groupid, $userid, $renewal_date='')
 	log_message('LOG_USER_GROUP_PAID', $userid,$groupid);
 }
 
-function process_payment($groupid, $userid, $uncleared)
+function process_payment($groupid, $userid, $uncleared, $billing='9')
 {
 	global $db, $config;
 	
@@ -101,7 +101,7 @@ function process_payment($groupid, $userid, $uncleared)
 	
 	$is_member 		= !empty($user_group['user_id']);
 	$pending		= $user_group['user_pending'];
-	
+
 	if ($uncleared) // Cleared payment
 	{
 		log_message('LOG_USER_GROUP_PAYMENT_SENT', $userid,$groupid);
@@ -124,12 +124,12 @@ function process_payment($groupid, $userid, $uncleared)
 		}
 		group_user_add($groupid,$userid,null,null,$config['ms_default_group'],null,$pending);
 		log_message('LOG_USER_GROUP_JOINED', $userid,$groupid);
-			if ($pending && $config['ms_approval_required']==0)
+		if ($pending && $config['ms_approval_required']==0)
 		{
 			mark_approved($userid, $groupid);
 		}			
 	}
-	$next_renewal_date = calc_date($config['ms_billing_cycle'.$membership['billing']], $config['ms_billing_cycle'.$membership['billing'].'_basis'], $renewal_date);
+	$next_renewal_date = calc_date($config['ms_billing_cycle'.$billing], $config['ms_billing_cycle'.$billing.'_basis'], $renewal_date);
 	$sql_ary = array(
 		'remindercount'	=> '0', 
 		'reminderdate'	=> '0',
@@ -137,10 +137,10 @@ function process_payment($groupid, $userid, $uncleared)
 		'uncleared'		=> $uncleared,
 		'datepaid'		=> time(),
 	);
-	if ($uncleared == $config['ms_process_on_payment']) // Cleared payment
+	if ((!$uncleared) || (!$config['ms_process_on_payment'])) // Cleared payment
 	{
-		$sql_ary['renewal_date']	= $next_renewal_date;
-		$sql_ary['prev_renewal_date'] = $renewal_date;
+		$sql_ary['renewal_date']		= $next_renewal_date;
+		$sql_ary['prev_renewal_date']	= $renewal_date;
 	}
 
 	update_membership($groupid,$userid, $sql_ary);
@@ -257,32 +257,27 @@ function display_subscription_message($userid,$groupid, $type='')
 function calculate_start_date()
 {
 	global $config;
+	$month = date('n');
 
 	switch ($config['ms_period_start'])
 	{
 		case '-1':  // Always start on 1st of month
-			$renewal_date=mktime(0,0,0,date('n'),1);
-			break;
+		break;
 		case '1':	// Start on 1st of next month unless it's the first
 			if (date('j')>1)
 			{
-				$renewal_date=mktime(0,0,0,date('n')+1,1);
+				$month = $month+1;
 			}
-			break;
+		break;
 		case '2':	// start on 1st of this month or next month whichever is closer
 			if (round(date('j'))>date('t')/2)
 			{
-				$renewal_date=mktime(0,0,0,date('n')+1,1);
+				$month = $month+1;
 			}
-			else
-			{
-				$renewal_date=mktime(0,0,0,date('n'),1);
-			}
-			break;
-		default:	// Start today
-			$renewal_date = mktime(0,0,0);
+		break;
 	}
-	return $renewal_date;
+	return mktime(0,0,0,$month,1);
+
 }
 
 function calc_date($billing_cycle=1, $billing_cycle_basis='y', $date=0)
@@ -292,8 +287,34 @@ function calc_date($billing_cycle=1, $billing_cycle_basis='y', $date=0)
 	{
 		$date = time();
 	}
-	$date = mktime('0','0','0',date('m',$date),date('d',$date),date('Y',$date));
-	return (strtotime('now ' . sprintf('%+d',$billing_cycle) . ' ' . period_text($billing_cycle_basis), $date));
+	$days = $months = $years = 0;
+	switch ($billing_cycle_basis)
+	{
+		case 'd':
+		{
+			$days = $billing_cycle;
+		}
+		break;
+		
+		case 'w':
+		{
+			$days = $billing_cycle * 7;
+		}
+		break;
+
+		case 'm':
+		{
+			$months = $billing_cycle;
+		}
+		break;
+		
+		case 'y':
+		{
+			$years = $billing_cycle;
+		}
+		break;
+	}
+	return mktime('0','0','0',date('m',$date)+$months, date('d',$date)+$days, date('Y',$date)+$years);
 }
 
 
@@ -530,5 +551,40 @@ function remove_member($groupid, $userid, $associate=0)
 	$db->sql_freeresult($result);
 
 	group_user_del($groupid, $userid);
+}
+
+function subscription_enabled()
+{
+	global $config;
+	$return = false;
+
+	$results = substr_in_array(array_keys($config), 'pp_subscription_allowed_');
+	foreach ($results as $result)
+	{
+		if ($config[$result])
+		{
+			$return=true;
+			break;
+		}
+	}
+	return $return;
+
+}
+function substr_in_array($haystack, $needle)
+{
+	$found = ARRAY();
+
+	// cast to array
+	$needle = (ARRAY) $needle;
+
+	// map with preg_quote
+	$needle = ARRAY_MAP('preg_quote', $needle);
+
+	// loop over  array to get the search pattern
+	FOREACH ($needle AS $pattern)
+	{
+		$found = PREG_GREP("/$pattern/", $haystack);
+	}
+	RETURN $found;
 }
 ?>

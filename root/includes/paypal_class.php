@@ -57,7 +57,6 @@ class paypal_class extends payment_class
 
 	const PP_VERSION = '71.0';
 
-
 	function __construct()
 	{
 		
@@ -88,11 +87,12 @@ class paypal_class extends payment_class
 		// values can be overwritten by the calling script.
 		
 		$this->fields['VERSION'] = self::PP_VERSION;
+
 	}
 
 	public function checkout()
 	{
-		parent::calc_basket_total();		
+		parent::calc_basket_total();
 		if ($this->process_request($this->fields))
 		{
 			parent::preserve_shopping_basket($this->fields);
@@ -103,9 +103,11 @@ class paypal_class extends payment_class
 		return;
 	
 	}
-
-	public function take_payment()
 	
+	/*
+	*	Returns Expired, Failed, Success
+	*/
+	public function take_payment()
 	{
 		$token = $_GET['token'];
 		$payer = $_GET['PayerID'];
@@ -114,7 +116,7 @@ class paypal_class extends payment_class
 		{
 			$this->failed(__FILE__, __LINE__, $this);
 			trigger_error('your session has expired');
-			return -1;
+			return 'expired';
 		}
 		else
 		{
@@ -125,7 +127,7 @@ class paypal_class extends payment_class
 		if (!$this->process_request($this->fields))
 		{
 			$this->failed(__FILE__, __LINE__, $this);
-			return false;
+			return 'failed';
 		}
 		if (isset($this->fields['BILLINGFREQUENCY']))
 		{
@@ -155,7 +157,7 @@ class paypal_class extends payment_class
 			{
 				$this->subscriber_id = $this->EC_data['PROFILEID'];
 			}
-			return false;
+			return '0';
 		}
 	}
 
@@ -219,8 +221,8 @@ class paypal_class extends payment_class
 	private function process_request($data)
 	{
 		global $config;
-		
-		$r = new HTTPRequest($this->host, $this->endpoint, 'POST', $config['pp_paypal_secure']);
+
+		$r = new PayPalHTTPRequest($this->host, $this->endpoint, 'POST', $config['pp_paypal_secure']);
 		$data['USER'] = $config['pp_paypal'.($config['pp_paypal_use_sandbox'] ? '_sandbox_' : '_').'API_username'];
 		$data['PWD'] = $config['pp_paypal'.($config['pp_paypal_use_sandbox'] ? '_sandbox_' : '_').'API_password'];
 		$data['SIGNATURE'] = $config['pp_paypal'.($config['pp_paypal_use_sandbox'] ? '_sandbox_' : '_').'API_signature'];
@@ -346,9 +348,8 @@ class paypal_class extends payment_class
 	}
  
 }
-class HTTPRequest
+class PayPalHTTPRequest
 {
-
 	private $host;
 	private $path;
 	private $data;
@@ -362,6 +363,7 @@ class HTTPRequest
 
 	function __construct($host, $endpoint, $method = 'POST', $ssl = false, $port = 0)
 	{
+
 		$this->host = $host;
 
 		$this->rawhost = ($ssl ? "ssl://" : "https://").$host;
@@ -417,7 +419,6 @@ class HTTPRequest
 		}
 		else
 		{
-
 			while ($chunk_length = hexdec(fgets($fp)))
 			{
 				$responseContentChunk = '';
@@ -435,7 +436,6 @@ class HTTPRequest
 				fgets($fp);
 				 
 			}
-			 
 		}
 		$this_header = rtrim($responseHeader);
 			$this->parsed_header=explode("\r\n", $this_header);
