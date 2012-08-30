@@ -163,7 +163,7 @@ switch ($mode)
 	{
 		if (confirm_box(true))
 		{
-			process_payment($groupid, $userid, false);
+			process_payment($groupid, $userid, false, $billing);
 		}
 		else
 		{
@@ -173,6 +173,7 @@ switch ($mode)
 					'i'			=> $userid,
 					'g'			=> $groupid,
 					'mode'		=> $mode,
+					'billing'	=> $billing,
 					'action'	=> 'confirm_paid',
 				)));
 			}
@@ -283,8 +284,10 @@ switch ($mode)
 	
 	case 'paid':
 	{
-		$uncleared = request_var('status', $config['ms_process_on_payment']);
-		process_payment($groupid, $userid, $uncleared);
+		$uncleared	= request_var('status', $config['ms_process_on_payment']);
+		$billing	= request_var('billing', 'x');
+
+		process_payment($groupid, $userid, $uncleared, $billing);
 		if (!$is_member)
 		{
 			if ($config['ms_application_forum'])
@@ -382,10 +385,8 @@ switch ($mode)
 	{
 		present_billing_cycle();
 
-		$template->assign_vars(array(
-			'S_ACTION'	=> append_sid("{$phpbb_root_path}application.$phpEx","i={$userid}&g={$groupid}&mode=billing&ref={$membership_no}&r={$in_registration}"),
-			'GIVE_OPTION'		=> !$in_registration,
-			));		
+		$template->assign_var('S_ACTION', append_sid("{$phpbb_root_path}application.$phpEx","i={$userid}&g={$groupid}&mode=billing&ref={$membership_no}&r={$in_registration}"));
+		$template->assign_var('GIVE_OPTION', (!$in_registration && subscription_enabled()));
 		$template->set_filenames(array(
 			'body' => 'subscription.html',
 		));
@@ -501,10 +502,8 @@ switch ($mode)
 		if ($bill)
 		{
 			present_billing_cycle(); // Select subscription period and charge
-			$template->assign_vars(array(
-				'S_ACTION'		=> append_sid("{$phpbb_root_path}application.$phpEx","mode=billing&i={$userid}&g={$groupid}&r={$in_registration}"),
-				'GIVE_OPTION'	=> !$in_registration,
-				));		
+			$template->assign_var('GIVE_OPTION', (!$in_registration && subscription_enabled()));
+			$template->assign_var('S_ACTION',		append_sid("{$phpbb_root_path}application.$phpEx","mode=billing&i={$userid}&g={$groupid}&r={$in_registration}"));
 			$template->set_filenames(array(
 				'body'			=> 'subscription.html',
 			));

@@ -66,12 +66,6 @@ $versions = array(
 	'0.0.19'	=> array(
 		'config_add' => array(
 			array('ms_default_group', '0', 0),
-			array('pp_enable_payment', '0', 0),
-		),
-	),
-	'0.0.18'	=> array(
-		'config_add' => array(
-			array('payment_mod', '0', '0.0.1'),
 		),
 	),
 	'0.0.17'	=> array(
@@ -79,13 +73,6 @@ $versions = array(
 			array('ms_registration', 'how membership is presented during registration', ''),
 		),
 	),
-	'0.0.16'	=> array(
-		'config_add' => array(
-			array('pp_paypal_err_email', 'email address to send errors to', ''),
-		),
-	),
-// No changes required for V0.0.15
-// No changes required for V0.0.14
 	'0.0.13'	=> array(
 		'config_add' => array(
 			array('ms_associate_rank', '0', 0),
@@ -121,9 +108,6 @@ $versions = array(
 			array(MEMBERSHIP_TABLE, 'prev_renewal_date', array('INT:11',0)),
 			array(MEMBERSHIP_TABLE, 'billing', array('INT:1',0)),
 		),
-		'config_add' => array(
-			array('pp_payment_locale', '&pound;%01.2f', 0),
-		),
 	),
 	'0.0.8'	=> array(
 		'config_add' => array(
@@ -134,18 +118,7 @@ $versions = array(
 		'table_column_add' => array(			
 			array(IPN_LOG_TABLE, 'txn_type', array('VCHAR:20', '')), 
 		), 
-		'config_add' => array(
-			array('pp_paypal_secure', '0', 0),
-			array('pp_paypal_image', '0', 0),
-			array('pp_eft_image', '0', 0),
-			array('pp_cheque_image', '0', 0),
-		),
 	),	
-	'0.0.6'	=> array(
-		'config_add' => array(
-			array('pp_email_notification', '', 0),
-		),
-	),
 	'0.0.5'	=> array(
 		'table_column_add' => array(
 			array(MEMBERSHIP_TABLE, 'associate_id', array('INT:11',0)),
@@ -235,27 +208,6 @@ $versions = array(
 			array('ms_billing_cycle5', '0', 0),
 			array('ms_billing_cycle5_basis', 'y', 0),
 			array('ms_billing_cycle5_amount', '0', 0),
-			array('pp_subscription_allowed_cheque', '0', 0),
-			array('pp_payment_method_cheque', '0', 0),
-			array('pp_subscription_allowed_eft', '0', 0),
-			array('pp_payment_method_eft', '0', 0),
-			array('pp_subscription_allowed_paypal', '0', 1),
-			array('pp_payment_method_paypal', '0', 0),
-			array('pp_eft_bankname', 'Enter the name of the bank holding your account', 0),
-			array('pp_cheque_address', 'Type the address you want the cheque sent to', 0),
-			array('pp_eft_account', '012345678', 0),
-			array('pp_eft_bankaddress', 'type in the address of your bank', 0),
-			array('pp_eft_bankcode', '00-00-00', 0),
-			array('pp_paypal_co_name', 'The name to appear on Paypal statement', 0),
-			array('pp_paypal_currency_code', 'GBP', 0),
-			array('pp_paypal_p_account', 'Your paypal email account or account no', 0),
-			array('pp_paypal_use_sandbox', '1', 0),
-			array('pp_paypal_API_userid', 'Your Paypal Express Checkout API userid', 0),
-			array('pp_paypal_API_password', 'Your Paypal Express Checkout API Password', 0),
-			array('pp_paypal_API_signature', 'Your Paypal Express Checkout API signature', 0),
-			array('pp_paypal_sandbox_API_userid', 'Your Paypal Express Checkout API userid', 0),
-			array('pp_paypal_sandbox_API_password', 'Your Paypal Express Checkout API Password', 0),
-			array('pp_paypal_sandbox_API_signature', 'Your Paypal Express Checkout API signature', 0),
 			array('membership_gc', '86400', 0),
 			array('membership_last_gc', '0', true)
 		),
@@ -265,11 +217,6 @@ $versions = array(
 			array('acp', 'ACP_MEMBERSHIP', array(
 				'module_basename' => 'membership',
 				'modes' => array('settings', 'list'),
-				),
-			),
-			array('acp', 'ACP_CAT_DOT_MODS', 'ACP_PAYMENTS'),
-			array('acp', 'ACP_PAYMENTS', array(
-				'module_basename' => 'payments',
 				),
 			),
 		),
