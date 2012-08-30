@@ -57,6 +57,19 @@ $language_file = 'mods/application';
 * The version numbering must otherwise be compatible with the version_compare function - http://php.net/manual/en/function.version-compare.php
 */
 $versions = array(
+// Introduces individual groups per cycle
+	'0.1.0'	=> array(
+		'table_column_add' => array(
+			array(MEMBERSHIP_TABLE, 'date_joined', array('INT:11',0)),
+		),
+		'config_add' => array(
+			array('ms_billing_cycle1_group', '5', 0),
+			array('ms_billing_cycle2_group', '5', 0),
+			array('ms_billing_cycle3_group', '5', 0),
+			array('ms_billing_cycle4_group', '5', 0),
+			array('ms_billing_cycle5_group', '5', 0),
+			),
+	),
 // No changes required for V0.0.21
 	'0.0.20'	=> array(
 		'table_column_add' => array(
@@ -236,9 +249,6 @@ function other_elements($action, $version)
 		array('ms_postcode','2','postcode','10','0','20','','','.*','0','1','1','1','1','8','1','0','Post Code', 'Please enter your postcode'),
 		array('ms_phone','2','phone','20','0','20','','','.*','0','1','0','1','1','9','1','0','Phone number', 'This information will not be made available unless you give permission'),
 		array('ms_mobile','2','mobile','20','0','20','','','.*','0','1','1','1','1','10','1','0','Mobile Phone', 'Please enter your mobile phone number. The number is kept private and would only be used if we needed to get in touch with you urgently. For instance if a rally was cancelled at short notice.'),
-		array('ms_vehicle', '2', 'vehicle', '20', '0', '40', '', '', '.*', '0', '1', '0', '0', '1', '3', '1', '1','Make and Model', 'Vehicle make and model'),
-		array('ms_vehicle_reg','2','vehicle_reg','10','0','10','','','[\w]+','0','1','1','1','1','5','1','0','Registration', '	(Paid up club members only) Please enter your rv registration number. This information is kept private.'),
-		array('ms_details','2','details','10','0','20','','','.*','0','1','0','1','1','4','1','0','Vehicle Details', 'Please enter the details about your vehicle'),
 		array('ms_publish','4','publish','2','0','0','0','0','','0','1','1','1','1','11','1','0','Publish Info?', 'Tick the box if your contact details can be published'),
  );
 

@@ -166,25 +166,25 @@ class payment_class
 		$this->preserve_shopping_basket();
 	}
 
-	public function cancel_subscription($subscriber_id='', $groupid, $userid)
+	public function cancel_subscription($subscriber_id='', $userid)
 	{
 		global $db;
 		// if called from application we know group/user find out subscriber	
 		// if called from ipnlistener we know subscriber
 		if (empty($subscriber_id))
 		{		
-			$sql = 'SELECT subscriber_id FROM ' . MEMBERSHIP_TABLE . " WHERE user_id = '{$userid}' AND group_id = '{$groupid}'";		
+			$sql = 'SELECT subscriber_id FROM ' . MEMBERSHIP_TABLE . " WHERE user_id = '{$userid}'";		
 			$result =$db->sql_query($sql);		
 			$subscriber_id = $db->sql_fetchfield('subscriber_id');				
 		}
-		$sql = 'UPDATE ' . MEMBERSHIP_TABLE . " SET subscriber_id='', portal='' WHERE group_id='{$groupid}' AND user_id='{$userid}'";
+		$sql = 'UPDATE ' . MEMBERSHIP_TABLE . " SET subscriber_id='', portal='' WHERE user_id='{$userid}'";
 		$db->sql_query($sql);	
-		log_message('LOG_USER_CANCELED_SUBSCRIPTION', $userid, $groupid);	
+		log_message('LOG_USER_CANCELED_SUBSCRIPTION', $userid);	
 		$this->remove_shopping_basket();
 		
 		if (function_exists('cancel_recurring_payment'))
 		{
-			cancel_recurring_payment($subscriber_id, $groupid, $userid);
+			$this->cancel_recurring_payment($subscriber_id, $userid);
 		}
 
 		return;

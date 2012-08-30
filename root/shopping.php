@@ -19,7 +19,7 @@ include($phpbb_root_path . 'includes/currency_format.' . $phpEx);
 // Start session management
 $user->session_begin();
 $auth->acl($user->data);
-$user->setup(array('mods/shop','mods/application'));
+$user->setup(array('mods/shopping'));
 
 global $db, $user, $auth, $template;
 global $config, $phpbb_root_path, $phpEx;

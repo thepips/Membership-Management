@@ -161,14 +161,15 @@ class paypal_class extends payment_class
 		}
 	}
 
-	public function cancel_recurring_payment($subscriber_id='', $groupid, $userid)
+	public function cancel_recurring_payment($subscriber_id='', $userid)
 	{
 		$this->add_field('METHOD', 'GetRecurringPaymentsProfileDetails');	
 		$this->add_field('PROFILEID', $subscriber_id);	
 		if ($this->process_request($this->fields))	
 		{		
+
 			list($EC_groupid, $EC_userid) = explode('-', $this->EC_data['PROFILEREFERENCE']);		
-			if (($EC_groupid == $groupid) && ($EC_userid == $userid))		
+			if ($EC_userid == $userid)
 			{			
 				$this->add_field('METHOD', 'ManageRecurringPaymentsProfileStatus');			
 				$this->add_field('PROFILEID', $subscriber_id);			
@@ -179,7 +180,7 @@ class paypal_class extends payment_class
 				}		
 			}	
 		}	
-		log_message('LOG_USER_INVALID_SUBSCRIPTION' . $subscriber_id, $userid, $groupid);	
+		log_message('LOG_USER_INVALID_SUBSCRIPTION' . $subscriber_id, $userid);	
 		return false;
 	}
 	
@@ -270,57 +271,48 @@ class paypal_class extends payment_class
 		// generate the post string from the _POST vars aswell as load the
 		// _POST vars into an arry so we can play with them from the calling
 		// script.
-		$post_string = '';	
+		$post_string = "cmd=_notify-validate"; // append ipn command
 		foreach ($_POST as $field=>$value) 
 		{ 
 			$this->fields[$field] = $value;
-			$post_string .= $field.'='.urlencode(stripslashes($value)).'&'; 
+			$post_string .= '&' .$field . '=' . urlencode(stripslashes($value)); 
 		}
-		$post_string.="cmd=_notify-validate"; // append ipn command
 		
 		// open the connection to paypal
-			$fp = fsockopen ('ssl.paypal.com', 443, $errno, $errstr, 30);			 
-//		$fp = fsockopen($url_parsed[host],443,$err_num,$err_str,30); 
+		$fp = fsockopen($url_parsed['host'],443,$err_num,$err_str,30); 
 		if(!$fp)
 		{
 			 // could not open the connection.  If loggin is on, the error message
 			 // will be in the log.
+			 $this->write_results(array('ERROR: Cannot establish connection with Paypal', $header, $response, $post_string, $url_parsed));
 			 return false;
 		}
-		else
-		{			 // Post the data back to paypal
-			// post back to PayPal system to validate 
-			$header	 = "POST $url_parsed[path] HTTP/1.1\r\n"; 
-			$header	.= "Host: $url_parsed[host]\r\n"; 
-			$header	.= "Content-type: application/x-www-form-urlencoded\r\n"; 
-			$header	.= "Content-length: ".strlen($post_string)."\r\n"; 
+		// post back to PayPal system to validate 
+		$header	 = "POST " . $url_parsed['path'] . "HTTP/1.1\r\n"; 
+		$header	.= "Host: " . $url_parsed['host'] . "\r\n"; 
+		$header	.= "Content-type: application/x-www-form-urlencoded\r\n"; 
+		$header	.= "Content-length: ".strlen($post_string)."\r\n"; 
 
-			fputs($fp, $header . "\r\n\r\n");
-			fputs($fp, $post_string . "\r\n\r\n"); 
-			
-			// loop through the response from the server and append to variable
-			$response='';
-			while(!feof($fp)) 
-			{ 
-				$response .= fgets($fp, 1024); 
-			} 
-			
-			fclose($fp); // close connection
-		}
-		if (eregi("VERIFIED",$response))
+		fputs($fp, $header . "\r\n\r\n");
+		fputs($fp, $post_string . "\r\n\r\n"); 
+		
+		// loop through the response from the server and append to variable
+		$response='';
+		while(!feof($fp)) 
+		{ 
+			$response .= fgets($fp, 1024); 
+		} 
+		fclose($fp); // close connection
+
+		if (stripos($response, "VERIFIED") !== FALSE)
 		{
 			// Valid IPN transaction.
 			$return=$this->log_ipn(IPN_LOG_TABLE, $this->fields['txn_id'], $post_string);
 			return $return;
 		}
-		else
-		{
-		
-			// Invalid IPN transaction.  Check the log for details.
-			$this->write_results(array('Paypal class - Invalid IPN transaction ', $header, $response, $post_string, $url_parsed));
-			return 'fail';
-		}
-		
+		// Invalid IPN transaction.  Check the log for details.
+		$this->write_results(array('Paypal class - Invalid IPN transaction ', $header, $response, $post_string, $url_parsed));
+		return 'fail';
 	}
 	private function log_ipn($table_name, $txn_id, $ipn_data)
 	{
