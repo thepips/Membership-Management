@@ -51,9 +51,9 @@ if (!defined('IN_PHPBB'))
 
 	// Setup dates & messages
 
-	$due_date[1] = calc_date(-$config['ms_due_soon_period'], $config['ms_due_soon_period_basis']);	// looking for anything with a renewal date prior to today + 2m
-	$due_date[2] = calc_date(-$config['ms_due_period'], $config['ms_due_period_basis']);				// looking for anything with a renewal date prior to today + 1m
-	$due_date[3] = calc_date(-$config['ms_overdue_period'], $config['ms_overdue_period_basis']);		// looking for anything with a renewal date prior to today + 1d
+	$due_date[1] = calc_date($config['ms_due_soon_period'], $config['ms_due_soon_period_basis']);	// looking for anything with a renewal date prior to today + 2m
+	$due_date[2] = calc_date($config['ms_due_period'], $config['ms_due_period_basis']);				// looking for anything with a renewal date prior to today + 1m
+	$due_date[3] = calc_date($config['ms_overdue_period'], $config['ms_overdue_period_basis']);		// looking for anything with a renewal date prior to today + 1d
 	$due_date[4] = calc_date(-$config['ms_last_chance_period'], $config['ms_last_chance_period_basis']);// looking for anything with a renewal date prior to today - 1m
 	$sql_array = array(
 		'SELECT'    => 'm.*, u.user_id, u.username_clean, u.user_email, u.user_lang, u.user_jabber, u.user_notify_type, u.user_regdate, u.user_actkey, g.group_name',
@@ -143,4 +143,5 @@ if (!defined('IN_PHPBB'))
 		}
 	}
 	$db->sql_freeresult($result);
+	set_config('membership_last_gc', time());
 ?>

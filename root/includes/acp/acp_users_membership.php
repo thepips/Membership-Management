@@ -21,8 +21,11 @@ if (!defined('IN_PHPBB'))
 	{
 		if (confirm_box(true))
 		{
-			group_user_del($config['ms_subscription_group'], $user_id);
-			$sql = 'DELETE FROM ' . MEMBERSHIP_TABLE . ' WHERE group_id=' . $config['ms_subscription_group'] . ' AND user_id =' . $user_id;
+			$sql = 'SELECT group_id FROM ' . MEMBERSHIP_TABLE . ' WHERE user_id =' . $user_id;
+			$result = $db->sql_query($sql);
+			$group_id = $db->sql_fetchfield('group_id');
+			group_user_del($group_id, $user_id);
+			$sql = 'DELETE FROM ' . MEMBERSHIP_TABLE . ' WHERE user_id =' . $user_id;
 			$result = $db->sql_query($sql);
 			trigger_error($user->lang['USER_DELETED'] . adm_back_link($this->u_action));
 		}
@@ -50,7 +53,7 @@ if (!defined('IN_PHPBB'))
 				'ON'	=> 'u.user_id = m.associate_id'
 			),
 		),
-		'WHERE'		=>  'm.user_id = '. $user_id . ' AND m.group_id = '. $config['ms_subscription_group'],
+		'WHERE'		=>  'm.user_id = '. $user_id,
 	);
 	$sql=$db->sql_build_query('SELECT', $sql_array);
 	$result = $db->sql_query($sql);
@@ -62,13 +65,15 @@ if (!defined('IN_PHPBB'))
 
 	if ($not_member)
 	{
-		$row['membership_no'] = '';
-		$row['username_clean'] = '';
-		$row['renewal_date']=strtotime('+3 month');
-		$row['datepaid']=time();
+		$row['membership_no']	= '';
+		$row['username_clean']	= '';
+		$row['renewal_date']	= strtotime('+3 month');
+		$row['datepaid']		= time();
+		$row['group_id']		= 0;
 	}
 	$data = array(
 		'membership_no'		=> request_var('membership_no', $row['membership_no']),
+		'group_id'			=> request_var('premium_group', $row['group_id']),
 		'associate_name'	=> request_var('associate_name', $row['username_clean'].''),
 	);
 	$data['rday_day']		= request_var('rday_day', date('j',$row['renewal_date']));
@@ -154,7 +159,12 @@ if (!defined('IN_PHPBB'))
 
 		if (!sizeof($error))
 		{
-			update_membership($config['ms_subscription_group'], $user_id, $update_ary);
+			if ($data['group_id']!= $row['group_id'])
+			{
+				change_premium_group($user_id, $data['group_id']);
+				$update_ary['group_id'] = $data['group_id'];
+			}
+			update_membership($user_id, $update_ary);
 
 			if ($data['associate_name'] != $row['username_clean'])
 			{
@@ -201,16 +211,39 @@ if (!defined('IN_PHPBB'))
 	}
 	unset($now);
 
+	// build list of enabled premium groups
+	$groups = array();
+	for ($i = 1; $i <= 6; $i++)
+	{
+		$subscription_option = 'ms_billing_cycle' . $i;
+		if (!empty($config[$subscription_option]))
+		{
+			$groups[$config[$subscription_option . '_group']]=$config[$subscription_option . '_group'];
+		}
+	}
+	// build list of enabled premium groups
+	$sql = 'SELECT * FROM ' . GROUPS_TABLE . ' WHERE group_id IN (' . implode(",", array_keys($groups)) . ')';
+	$result = $db->sql_query($sql);
+	
+	$s_premium_group_options = '';
+
+	while ($row = $db->sql_fetchrow($result))
+	{
+		$s_premium_group_options .= '<option value="' . $row['group_id'] . '"' . (($row['group_id'] == $row['group_id']) ? ' selected="selected"' : '') . '>' . $row['group_name'] . '</option>';
+	}
+	$db->sql_freeresult($result);
+	
 	$template->assign_vars(array(
-		'NOT_MEMBER'			=> $not_member,
-		'MEMBERSHIP_NO'			=> $data['membership_no'],
+		'NOT_MEMBER'				=> $not_member,
+		'MEMBERSHIP_NO'				=> $data['membership_no'],
 		'ASSOCIATE_NAME'			=> $data['associate_name'],
-		'S_RENEWAL_DAY_OPTIONS'	=> $s_renewal_day_options,
+		'S_RENEWAL_DAY_OPTIONS'		=> $s_renewal_day_options,
 		'S_RENEWAL_MONTH_OPTIONS'	=> $s_renewal_month_options,
 		'S_RENEWAL_YEAR_OPTIONS'	=> $s_renewal_year_options,
-		'S_PAID_DAY_OPTIONS'	=> $s_paid_day_options,
-		'S_PAID_MONTH_OPTIONS'	=> $s_paid_month_options,
-		'S_PAID_YEAR_OPTIONS'	=> $s_paid_year_options,
+		'S_PAID_DAY_OPTIONS'		=> $s_paid_day_options,
+		'S_PAID_MONTH_OPTIONS'		=> $s_paid_month_options,
+		'S_PAID_YEAR_OPTIONS'		=> $s_paid_year_options,
+		'S_PREMIUM_GROUP_OPTIONS'	=> $s_premium_group_options,
 
 		'S_USERS_MEMBERSHIP'		=> true)
 	);

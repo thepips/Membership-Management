@@ -57,7 +57,6 @@ class acp_membership
 						'legend1'						=> 'SUBSCRIPTION_SETTINGS_TITLE',
 						'ms_enable_membership'			=> array('lang' => 'ENABLE_MEMBERSHIP', 'validate' => 'bool', 'type' => 'radio:yes_no',	'explain' => true),
 						'ms_registration'				=> array('lang' => 'REGISTRATION', 'validate' => 'int', 'type' => 'custom', 'method' => 'registration', 'explain' => true),
-						'ms_subscription_group'			=> array('lang' => 'SUBSCRIPTION_GROUP', 'validate' => 'int', 'type' => 'select', 'method' => 'subscription_group', 'explain' => true),
 						'ms_default_group'				=> array('lang' => 'DEFAULT_GROUP', 'validate' => 'bool', 'type' => 'radio:yes_no',	'explain' => true),
 						'ms_rank'						=> array('lang'	=> 'RANK', 'validate' => 'int', 'type' => 'select', 'method' => 'rank', 'explain' => true),
 						'ms_subscription_extra_days'	=> array('lang' => 'SUBSCRIPTION_EXTRA_DAYS',		'validate' => 'int',	'type' => 'text:4:4',	'explain' => true),
@@ -86,14 +85,19 @@ class acp_membership
 						'ms_grace_period_basis'			=> false,
 						'ms_billing_cycle1_amount'		=> false,
 						'ms_billing_cycle1_basis'		=> false,
+						'ms_billing_cycle1_group'		=> false,
 						'ms_billing_cycle2_amount'		=> false,
 						'ms_billing_cycle2_basis'		=> false,
+						'ms_billing_cycle2_group'		=> false,
 						'ms_billing_cycle3_amount'		=> false,
 						'ms_billing_cycle3_basis'		=> false,
+						'ms_billing_cycle3_group'		=> false,
 						'ms_billing_cycle4_amount'		=> false,
 						'ms_billing_cycle4_basis'		=> false,
+						'ms_billing_cycle4_group'		=> false,
 						'ms_billing_cycle5_amount'		=> false,
 						'ms_billing_cycle5_basis'		=> false,
+						'ms_billing_cycle5_group'		=> false,
 						'legend3'						=> 'MEMBERSHIP_DATE_FORMAT_TITLE',
 						'ms_membership_date_format'		=> array('lang' => 'MEMBERSHIP_DATE_FORMAT', 'validate' => 'text', 'type' => 'text:10:20',	'explain' => true),
 				));
@@ -209,19 +213,15 @@ class acp_membership
 				$data['rday_day']	= request_var('rday_day', date('j', $renewal_date));
 				$data['rday_month'] = request_var('rday_month', date('n', $renewal_date));
 				$data['rday_year']  = request_var('rday_year', date('Y', $renewal_date));
-
-				$sql = 'SELECT  group_name FROM ' . GROUPS_TABLE . ' WHERE group_id = "' . $config['ms_subscription_group'] . '"';
-				$result = $db->sql_query($sql);
-				$group_name = $db->sql_fetchfield('group_name');
-				$db->sql_freeresult($result);
-
+				$premium_group		= request_var('premium_group',1);
+				$group_filter		= request_var('group_filter', 0);
 				$action	= request_var('action', '');
 				$mark	= (isset($_REQUEST['mark'])) ? request_var('mark', array(0)) : array();
 				$start	= request_var('start', 0);
 		
 				// Sort keys
 				$limit_records_to	= request_var('st', 0);
-				$sort_key			= request_var('sk', 'n');
+				$sort_key			= request_var('sk', 'r');
 				$sort_dir			= request_var('sd', 'a');
 		
 				$form_key = 'acp_membership';
@@ -241,15 +241,15 @@ class acp_membership
   
 				$where = array(
 					// All Members
-					(" AND m.group_id='{$config['ms_subscription_group']}'"),
+					(' AND m.user_id IS NOT NULL'),
 					// Overdue i.e. renewal_date is before today
-					(" AND m.group_id='{$config['ms_subscription_group']}' AND m.remindertype='3'"),
+					(" AND m.remindertype='3'"),
 					// Due this period i.e. due soon
-					(" AND m.group_id='{$config['ms_subscription_group']}' AND m.remindertype='2'"),
+					(" AND m.remindertype='2'"),
 					//Due next period i.e. due on date
-					(" AND m.group_id='{$config['ms_subscription_group']}' AND m.remindertype='1'"),
+					(" AND m.remindertype='1'"),
 					//Missing Renewal Date
-					(" AND m.group_id='{$config['ms_subscription_group']}' AND (m.renewal_date IS NULL)"),
+					(" AND (m.renewal_date IS NULL)"),
 					//Not members
 					(' AND m.user_id IS NULL'),
 					//Group members missing subscription record
@@ -257,9 +257,9 @@ class acp_membership
 				);
   
 
-				$sort_by_text = array('r' => $user->lang['SORT_RENEWAL'], 'j' => $user->lang['SORT_REG_DATE'], 'n' => $user->lang['SORT_REALNAME'], 'd' => $user->lang['SORT_LAST_REMINDER'], 'u' => $user->lang['SORT_USERNAME'], 'p' => $user->lang['SORT_POSTS'], 'e' => $user->lang['SORT_REMINDER'], 'l' => $user->lang['SORT_LAST_VISIT']);
+				$sort_by_text = array('r' => $user->lang['SORT_RENEWAL'], 'j' => $user->lang['SORT_DATE_JOINED'], 'n' => $user->lang['SORT_REALNAME'], 'd' => $user->lang['SORT_LAST_REMINDER'], 'u' => $user->lang['SORT_USERNAME'], 'p' => $user->lang['SORT_POSTS'], 'e' => $user->lang['SORT_REMINDER'], 'l' => $user->lang['SORT_LAST_VISIT']);
 		
-				$sort_by_sql = array('r' => 'renewal_date', 'j' => 'user_regdate', 'n' => 'pf_realname', 'd' => 'user_reminded_time', 'u' => 'username_clean', 'p' => 'user_posts', 'e' => 'user_reminded', 'l' => 'user_lastvisit');
+				$sort_by_sql = array('r' => 'renewal_date', 'j' => 'date_joined', 'n' => 'pf_realname', 'd' => 'user_reminded_time', 'u' => 'username_clean', 'p' => 'user_posts', 'e' => 'user_reminded', 'l' => 'user_lastvisit');
 		
 				$s_limit_records = $s_sort_key = $s_sort_dir = $u_sort_param = '';
 				gen_sort_selects($limit_records, $sort_by_text, $limit_records_to, $sort_key, $sort_dir, $s_limit_records, $s_sort_key, $s_sort_dir, $u_sort_param);
@@ -281,159 +281,100 @@ class acp_membership
 					}
 					if (!sizeof($error))
 					{
-						switch ($action)
+						// Get those 'marked'...
+						if (confirm_box(true))
 						{
-							case 'join':
-							case 'renew':
-								// Get those 'being renewed'...
-								if (confirm_box(true))
+							$sql_array = array(
+								'SELECT' => 'u.user_id, u.username, u.user_email, u.user_lang, u.user_jabber, u.user_notify_type, m.date_joined, u.user_actkey, pfd.*, m.remindercount, m.renewal_date, m.user_id as in_membership, ug.user_id as in_group, g.group_name',
+								'FROM' => array(
+									USERS_TABLE=> 'u',
+								),
+								'LEFT_JOIN' => array(
+									array(
+										'FROM'  => array(MEMBERSHIP_TABLE => 'm'),
+										'ON' => ('m.user_id = u.user_id'),
+									),
+									array(
+										'FROM'  => array(USER_GROUP_TABLE => 'ug'),
+										'ON' => ('ug.user_id = u.user_id AND ug.group_id=m.group_id' ),
+									),
+									array(
+										'FROM'  => array(GROUPS_TABLE => 'g'),
+										'ON' => ('g.group_id=m.group_id'),
+									),
+									array(
+										'FROM'  => array(PROFILE_FIELDS_DATA_TABLE => 'pfd'),
+										'ON' => ('pfd.user_id = u.user_id'),
+									),
+								),
+								'WHERE'	=> 'u.' . $db->sql_in_set('user_id', $mark),
+							);
+							$sql=$db->sql_build_query('SELECT', $sql_array);
+
+							$result = $db->sql_query($sql);
+		
+							$user_marked = array();
+							while ($row = $db->sql_fetchrow($result))
+							{
+								$user_marked[] = $row;
+							}
+							$db->sql_freeresult($result);
+
+							foreach ($user_marked as $user_selected)
+							{
+								switch ($action)
 								{
-									$sql_array = array(
-										'SELECT' => 'u.user_id, username, renewal_date, m.user_id as in_membership, ug.user_id as in_group',
-										'FROM' => array(
-											USERS_TABLE=> 'u',
-										),
-										'LEFT_JOIN' => array(
-											array(
-												'FROM'  => array(MEMBERSHIP_TABLE => 'm'),
-												'ON' => ('m.user_id = u.user_id AND m.group_id=' . $config['ms_subscription_group']),
-											),
-											array(
-												'FROM'  => array(USER_GROUP_TABLE => 'ug'),
-												'ON' => ('ug.user_id = u.user_id AND ug.group_id=' . $config['ms_subscription_group']),
-											),
-										),
-										'WHERE'	=> 'u.' . $db->sql_in_set('user_id', $mark),
-									);
-									$sql=$db->sql_build_query('SELECT', $sql_array);
+									case 'join':
+									case 'renew':
 
-									$result = $db->sql_query($sql);
-				
-									$user_marked = array();
-									while ($row = $db->sql_fetchrow($result))
-									{
-										$user_marked[] = $row;
-									}
-									$db->sql_freeresult($result);
+										$sql_ary = array(
+											'remindercount'	=> '0', 
+											'reminderdate'	=> '0',
+											'remindertype'	=> '0',
+											'renewal_date'	=> $renewal_date,
+											'group_id'		=> $premium_group,
+										);
 
-									$sql_ary = array(
-										'remindercount'	=> '0', 
-										'reminderdate'	=> '0',
-										'remindertype'	=> '0',
-										'renewal_date'	=> $renewal_date,
-									);
-
-									foreach ($user_marked as $user_selected)
-									{
-										update_membership($config['ms_subscription_group'], $user_selected['user_id'], $sql_ary);
+										update_membership($user_selected['user_id'], $sql_ary);
 
 										if ($action=='join' || empty($user_marked['in_group']))
 										{
-											group_user_add($config['ms_subscription_group'],$user_selected['user_id'], false, false, $config['ms_default_group'], 0, $config['ms_approval_required']);
+											group_user_add($premium_group,$user_selected['user_id'], false, false, $config['ms_default_group'], 0, $config['ms_approval_required']);
 										}
 										ELSE										
 										{
 											add_log('admin', 'LOG_USER_GROUP_RENEWED', $user_selected['username'], $group_name);
 										}
-									}
-								}
-								else
-								{
-									$s_hidden_fields = array(
-										'mode'			=> $mode,
-										'action'		=> $action,
-										'mark'			=> $mark,
-										'submit'		=> 1,
-										'start'			=> $start,
-										'renewal_date'	=> $renewal_date,
-									);
-									confirm_box(false, $user->lang['RENEWAL_CONFIRMATION'], build_hidden_fields($s_hidden_fields));
-			
-								}
-								// For activate we really need to redirect, else a refresh can result in users being deactivated again
-			
-								$u_action = $this->u_action . "&amp;$u_sort_param&amp;start=$start";
-								$u_action .= ($per_page != $config['topics_per_page']) ? "&amp;users_per_page=$per_page" : '';
-			
-								redirect($u_action);
-								break;
-								
-							case 'remove':
-			
-								if (confirm_box(true))
-								{
-									$sql = 'SELECT user_id
-										FROM ' . USERS_TABLE . '
-										WHERE ' . $db->sql_in_set('user_id', $mark);
-									$result = $db->sql_query($sql);
+				
+										// For activate we really need to redirect, else a refresh can result in users being deactivated again
+					
+										$u_action = $this->u_action . "&amp;$u_sort_param&amp;start=$start";
+										$u_action .= ($per_page != $config['topics_per_page']) ? "&amp;users_per_page=$per_page" : '';
+					
+										redirect($u_action);
+									break;
 									
-									while ($row = $db->sql_fetchrow($result))
-									{
-										$userids[]  = $row['user_id'];
-									}
-									$db->sql_freeresult($result);
-									foreach($userids as $user_selected)
-									{
-										remove_member($config['ms_subscription_group'], $user_selected);
-									}
-								}
-								else
-								{
-									$s_hidden_fields = array(
-										'mode'			=> $mode,
-										'action'		=> $action,
-										'mark'			=> $mark,
-										'submit'		=> 1,
-										'start'			=> $start,
-									);
-									confirm_box(false, $user->lang['CONFIRM_OPERATION'], build_hidden_fields($s_hidden_fields));
-								}
+									case 'remove':
+					
+										remove_member($user_selected['user_id']);
+				
+									break;
+				
+									case 'remind':
+				
+										// Send the messages
+										if(!class_exists('messenger'))
+										{
+											include($phpbb_root_path . 'includes/functions_messenger.' . $phpEx);
+										}
+				
+										$messenger = new messenger();
+										$usernames = array();
+				
+										$messenger->template('user_remind_inactive', $user_selected['user_lang']);
 			
-							break;
-			
-							case 'remind':
-								if (empty($config['email_enable']))
-								{
-									trigger_error($user->lang['EMAIL_DISABLED'] . adm_back_link($this->u_action), E_USER_WARNING);
-								}
-								$sql_array = array(
-									'SELECT' => 'u.user_id, username, user_email, user_lang, user_jabber, user_notify_type, user_regdate, user_actkey, pfd.*, remindercount, renewal_date',
-									'FROM' => array(
-										USERS_TABLE=> 'u',
-									),
-									'LEFT_JOIN' => array(
-										array(
-											'FROM'  => array(MEMBERSHIP_TABLE => 'm'),
-											'ON' => ('m.user_id = u.user_id AND m.group_id=' . $config['ms_subscription_group']),
-										),
-										array(
-											'FROM'  => array(PROFILE_FIELDS_DATA_TABLE => 'pfd'),
-											'ON' => ('pfd.user_id = u.user_id'),
-										),
-									),
-									'WHERE'	=> 'u.' . $db->sql_in_set('user_id', $mark),
-								);
-								$sql=$db->sql_build_query('SELECT', $sql_array);
-
-								$result = $db->sql_query($sql);
-			
-								if ($row = $db->sql_fetchrow($result))
-								{
-									// Send the messages
-									if(!class_exists('messenger'))
-									{
-										include($phpbb_root_path . 'includes/functions_messenger.' . $phpEx);
-									}
-			
-									$messenger = new messenger();
-									$usernames = $user_ids = array();
-			
-									do
-									{
-										$messenger->template('user_remind_inactive', $row['user_lang']);
-			
-										$messenger->to($row['user_email'], $row['username']);
-										$messenger->im($row['user_jabber'], $row['username']);
+										$messenger->to($user_selected['user_email'], $user_selected['username']);
+										$messenger->im($user_selected['user_jabber'], $user_selected['username']);
 			
 										$messenger->headers('X-AntiAbuse: Board servername - ' . $config['server_name']);
 										$messenger->headers('X-AntiAbuse: User_id - ' . $user->data['user_id']);
@@ -441,48 +382,56 @@ class acp_membership
 										$messenger->headers('X-AntiAbuse: User IP - ' . $user->ip);
 			
 										$messenger->assign_vars(array(
-											'USERNAME'		=> htmlspecialchars_decode($row['username']),
-											'REGISTER_DATE'	=> $user->format_date($row['user_regdate'], false, true),
-											'U_ACTIVATE'	=> generate_board_url() . "/ucp.$phpEx?mode=activate&u=" . $row['user_id'] . '&k=' . $row['user_actkey'])
+											'USERNAME'		=> htmlspecialchars_decode($user_selected['username']),
+											'REGISTER_DATE'	=> $user->format_date($user_selected['date_joined'], false, true),
+											'U_ACTIVATE'	=> generate_board_url() . "/ucp.$phpEx?mode=activate&u=" . $user_selected['user_id'] . '&k=' . $user_selected['user_actkey'])
 										);
 			
-										$messenger->send($row['user_notify_type']);
+										$messenger->send($user_selected['user_notify_type']);
 			
 										$usernames[] = $row['username'];
-										$user_ids[] = (int) $row['user_id'];
-									}
-									while ($row = $db->sql_fetchrow($result));
-			
-									$messenger->save_queue();
-			
-									// Add the remind state to the database
-									$sql_ary = array(
-										'reminderdate' => time(),
-									);
-			
-									foreach($user_ids as $user_id)
-									{
-										update_membership($config['ms_subscription_group'], $user_id, $sql_ary);
-									}
-									$result = $db->sql_query($sql);
+				
+										$messenger->save_queue();
+				
+										// Add the remind state to the database
+										$sql_ary = array(
+											'reminderdate'	=> time(),
+											'remindercount'	=> 'remindercount+1',
+										);
+										$sql = 'UPDATE ' . MEMBERSHIP_RECORD . '
+											SET reminderdate = ' . time() . ', remindercount=remindercount+1 
+											WHERE user_id IN ';
+										$result = $db->sql_query($sql);
 
-									$sql = 'UPDATE ' . MEMBERSHIP_TABLE . ' SET remindercount=remindercount+1 
-										WHERE ' . $db->sql_in_set('user_id', $user_ids) . "
-										AND group_id = " . $config['ms_subscription_group'];
-									$db->sql_query($sql);  
-			
-									add_log('admin', 'LOG_MEMBERSHIP_DUE_REMIND', implode(', ', $usernames));
-									unset($usernames);
+										add_log('admin', 'LOG_MEMBERSHIP_DUE_REMIND', implode(', ', $usernames));
+										unset($usernames);
+				
+										// For remind we really need to redirect, else a refresh can result in more than one reminder
+										$u_action = $this->u_action . "&amp;$u_sort_param&amp;start=$start";
+										$u_action .= ($per_page != $config['topics_per_page']) ? "&amp;users_per_page=$per_page" : '';
+					
+										redirect($u_action);
+					
+									break;
+									
+									case 'change':
+										change_premium_group($user_selected['user_id'], $premium_group);
+									break;
 								}
-								$db->sql_freeresult($result);
-			
-								// For remind we really need to redirect, else a refresh can result in more than one reminder
-								$u_action = $this->u_action . "&amp;$u_sort_param&amp;start=$start";
-								$u_action .= ($per_page != $config['topics_per_page']) ? "&amp;users_per_page=$per_page" : '';
-			
-								redirect($u_action);
-			
-							break;
+							}
+						}
+						else
+						{
+							$s_hidden_fields = array(
+								'mode'			=> $mode,
+								'action'		=> $action,
+								'mark'			=> $mark,
+								'submit'		=> 1,
+								'start'			=> $start,
+								'renewal_date'	=> $renewal_date,
+								'premium_group'	=> $premium_group,
+							);
+							confirm_box(false, $user->lang['CONFIRM_OPERATION'], build_hidden_fields($s_hidden_fields));
 						}
 					}
 					else
@@ -516,22 +465,115 @@ class acp_membership
 				}
 				unset($now);
 
+				$groups = array();
+				for ($i = 1; $i <= 6; $i++)
+				{
+					$subscription_option = 'ms_billing_cycle' . $i;
+					if (!empty($config[$subscription_option]))
+					{
+						$groups[$config[$subscription_option . '_group']]=$config[$subscription_option . '_group'];
+					}
+				}
+				// build list of enabled premium groups
+				$sql = 'SELECT * FROM ' . GROUPS_TABLE . ' WHERE group_id IN (' . implode(",", array_keys($groups)) . ')';
+				$result = $db->sql_query($sql);
+				
+				$premium_groups = '<select name="premium_group">';
+				$s_group_filter = '<select name="group_filter"><option value="0"' . ($group_filter == 0 ? ' selected="selected"' : '') .'>' . 'All Groups' . '</option>';
+
+				while ($row = $db->sql_fetchrow($result))
+				{
+					$premium_groups .= '<option value="' . $row['group_id'] . '"' . (($row['group_id'] == $premium_group) ? ' selected="selected"' : '') . '>' . $row['group_name'] . '</option>';
+					$s_group_filter .= '<option value="' . $row['group_id'] . '"' . (($row['group_id'] == $group_filter) ? ' selected="selected"' : '') . '>' . $row['group_name'] . '</option>';
+				}
+				$db->sql_freeresult($result);
+				
+				$premium_groups .= '</select>';
+				$s_group_filter .= '</select>';
 				
 				// Define where and sort sql 
 				
 				$sql_where = $where[$limit_records_to];
-				
+				if ($limit_records_to != 5)
+				{
+					if ($group_filter>0)
+					{
+						$sql_where .= ' AND m.group_id = ' . $group_filter;
+					}
+					else
+					{
+						$sql_where .= ' AND m.group_id IN (' . implode(',', $groups) . ')';
+					}
+				}
+
 				$sql_sort = $sort_by_sql[$sort_key] . ' ' . (($sort_dir == 'd') ? 'DESC' : 'ASC');
-		
+				
 				$members = array();
 				$members_count = 0;
 		
 				$start = view_members($members, $members_count, $per_page, $start, $sql_where, $sql_sort);
 
-				$error_message='';		
+				$error_message='';
+				$statuses = array('', 'Due Soon', 'Due', 'Overdue', 'Last Chance', 'To be removed');
+				if ($limit_records_to==5)
+				{
+					$option_ary=array('join'=>'JOIN');
+				}
+					else
+				{
+					$option_ary = array('renew' => 'RENEW', 'remove' => 'REMOVE', 'change' => 'CHANGE');
+					if ($config['email_enable'])
+					{
+						$option_ary += array('remind' => 'REMIND');
+					}
+					$dates[1] = calc_date($config['ms_due_soon_period'], $config['ms_due_soon_period_basis']);
+					$dates[2] = calc_date($config['ms_due_period'], $config['ms_due_period_basis']);
+					$dates[3] = calc_date($config['ms_overdue_period'], $config['ms_overdue_period_basis']);
+					$dates[4] = calc_date(-$config['ms_last_chance_period'], $config['ms_last_chance_period_basis']);
+					$dates[5] = calc_date(-$config['ms_grace_period'], $config['ms_grace_period_basis']);
+				}
+				$date_joined = $renewal_date = '';
+				$status = 0;
+
 				foreach ($members as $row)
 				{
-					if ($limit_records_to	== 6)
+					if ($limit_records_to != 5)
+					{
+						if (!$row['renewal_date']) 
+						{
+							$renewal_date = '-';
+						}
+						else
+						{
+							$renewal_date = $user->format_date($row['renewal_date'], $config['ms_membership_date_format']);
+							for ($i=5;$i>0; $i--)
+							{
+								if ($row['renewal_date']<$dates[$i])
+								{
+									break;
+								}
+							}
+							$status = $statuses[$i];
+						}
+						if (!empty($row['reminderdate']))
+						{
+							$reminder_date = $user->format_date($row['reminderdate'], $config['ms_membership_date_format']);
+						}
+						else
+						{
+							$reminder_date = '-';
+						}
+						
+						if (!empty($row['date_joined']))
+						{
+							$date_joined = $user->format_date($row['date_joined'], $config['ms_membership_date_format']);
+						}
+						else
+						{
+							$date_joined = '-';
+						}
+					}
+					if ($limit_records_to == 6)
 					{
 						if (is_null($row['in_group']))
 						{
@@ -543,12 +585,13 @@ class acp_membership
 						}
 					}
 					$template->assign_block_vars('members', array(
-						'ERROR_MESSAGE'		=> $error_message,
-						'RENEWAL_DATE'		=> (!$row['renewal_date']) ? ' - ' : $user->format_date($row['renewal_date'], $config['ms_membership_date_format']),
-						'REMINDED_DATE'		=> $user->format_date($row['reminderdate']),
-						'JOINED'			=> $user->format_date($row['user_regdate']),
+						'COMMENT'			=> $error_message,
+						'RENEWAL_DATE'		=> $renewal_date,
+						'STATUS'			=> $status,
+						'REMINDED_DATE'		=> $user->format_date($row['reminderdate'], $config['ms_membership_date_format']),
+						'JOINED'			=> $date_joined,
 						'LAST_VISIT'		=> (!$row['user_lastvisit']) ? ' - ' : $user->format_date($row['user_lastvisit']),
-		
+						'GROUP_NAME'		=> $row['group_name'],
 						'PF_REALNAME'		=> isset($row['pf_ms_realname']) ? $row['pf_ms_realname'] : '',
 						'REMINDED'			=> $row['remindercount'],
 						'REMINDED_EXPLAIN'	=> $user->lang('USER_LAST_REMINDED', $row['remindercount'], $user->format_date($row['reminderdate'])),
@@ -564,19 +607,10 @@ class acp_membership
 					));
 				}
 
-				if ($limit_records_to==5)
-				{
-					$option_ary=array('join'=>'RENEW');
-				}
-					else
-				{
-					$option_ary = array('renew' => 'RENEW', 'remove' => 'REMOVE');
-					if ($config['email_enable'])
-					{
-						$option_ary += array('remind' => 'REMIND');
-					}
-				}
+var_dump($group_filter);
 				$template->assign_vars(array(
+					'S_GROUP_FILTER'			=> $s_group_filter,
+					'S_PREMIUM_GROUPS'			=> $premium_groups,
 					'S_MEMBERSHIP_OPTIONS'		=> build_select($option_ary),
 					'S_RENEWAL_DAY_OPTIONS'		=> $s_renewal_day_options,	
 					'S_RENEWAL_MONTH_OPTIONS'	=> $s_renewal_month_options,	
@@ -628,28 +662,19 @@ class acp_membership
  
 	function billing_cycle($value, $key)
 	{
+		global $phpbb_root_path, $phpEx;
+
 		$period_basis = $key.'_basis';
 		$period_charge = $key.'_amount';
+		$period_group = $key.'_group';
 		
 		$return_string = '<input id="' . $period_charge . '" type="text" size="10" maxlength="20" name="config['. $period_charge . ']" value="' . $this->new_config[$period_charge] . '" />&nbsp;';
 		$return_string .= $this->time_interval($value, $key);
+		
+		$return_string .= '<select name="config['. $period_group . ']">' . group_select_options($this->new_config[$period_group], false, false) . '</select>';
 		return ($return_string);
 	}
   
-	/**
-	* Select subscription group action
-	*/
-	function subscription_group($value)
-	{
-		global $phpbb_root_path, $phpEx;
-		
-		if (!function_exists('group_select_options'))
-		{
-			include($phpbb_root_path . 'includes/functions_admin.' . $phpEx);
-		}
-		return $forum_list = group_select_options($value, false, false);
-	}
-
 	/**
 	* Select Application action
 	*/

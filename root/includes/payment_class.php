@@ -166,25 +166,25 @@ class payment_class
 		$this->preserve_shopping_basket();
 	}
 
-	public function cancel_subscription($subscriber_id='', $userid)
+	public function cancel_subscription($subscriber_id='', $groupid, $userid)
 	{
 		global $db;
 		// if called from application we know group/user find out subscriber	
 		// if called from ipnlistener we know subscriber
 		if (empty($subscriber_id))
 		{		
-			$sql = 'SELECT subscriber_id FROM ' . MEMBERSHIP_TABLE . " WHERE user_id = '{$userid}'";		
+			$sql = 'SELECT subscriber_id FROM ' . MEMBERSHIP_TABLE . " WHERE user_id = '{$userid}' AND group_id = '{$groupid}'";		
 			$result =$db->sql_query($sql);		
 			$subscriber_id = $db->sql_fetchfield('subscriber_id');				
 		}
-		$sql = 'UPDATE ' . MEMBERSHIP_TABLE . " SET subscriber_id='', portal='' WHERE user_id='{$userid}'";
+		$sql = 'UPDATE ' . MEMBERSHIP_TABLE . " SET subscriber_id='', portal='' WHERE group_id='{$groupid}' AND user_id='{$userid}'";
 		$db->sql_query($sql);	
-		log_message('LOG_USER_CANCELED_SUBSCRIPTION', $userid);	
+		log_message('LOG_USER_CANCELED_SUBSCRIPTION', $userid, $groupid);	
 		$this->remove_shopping_basket();
 		
 		if (function_exists('cancel_recurring_payment'))
 		{
-			$this->cancel_recurring_payment($subscriber_id, $userid);
+			cancel_recurring_payment($subscriber_id, $groupid, $userid);
 		}
 
 		return;
@@ -264,8 +264,8 @@ class payment_class
 
 	public function checkout()
 	{
-		$this->calc_basket_total();
-		$this->preserve_shopping_basket();
+		parent::calc_basket_total();	
+		parent::preserve_shopping_basket();
 		
 		return true;
 	}
@@ -273,13 +273,13 @@ class payment_class
 	public function take_payment()
 	{
 		global $config;
-		$this->retrieve_shopping_basket();
+		parent::retrieve_shopping_basket();
 		if ($this->fields==null)
 		{
 			trigger_error("I'm sorry but your session has expired");
 			return 'expired';
 		}
-		$this->remove_shopping_basket();
+		parent::remove_shopping_basket();
 		return $config['ms_process_on_payment'];
 	}
 

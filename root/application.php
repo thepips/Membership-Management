@@ -48,6 +48,7 @@ $mode					= request_var('mode', '');
 $type					= request_var('type', '');
 $userid					= request_var('i', $user->data['user_id']);
 
+
 $payment_enabled		= !empty($config['pp_enable_payment']);
 
 $payment_method			= request_var('method', 'payment');
@@ -92,6 +93,7 @@ else
 	$is_associate	= true;
 	$is_member		= true;
 }
+
 $payment_class = $payment_method . '_class';
 if (!class_exists($payment_class))
 {
@@ -167,7 +169,7 @@ switch ($mode)
 	{
 		if (confirm_box(true))
 		{
-			process_payment($userid, false, $billing);
+			process_payment($userid, false);
 		}
 		else
 		{
@@ -231,7 +233,7 @@ switch ($mode)
 
 	case 'billing':
 	{
-		$period_text 			= array('d' => 'DAY', 'w' => 'WEEK', 'm' => 'MONTH', 'y' => 'YEAR');
+
 		$billing				= request_var('rb_sub_choice',1);
 		$subscribing			= request_var('rb_subscription',FALSE);
 		$p->params['i']			= $userid;
@@ -246,8 +248,8 @@ switch ($mode)
 			{
 				$p->add_cart_item(null , $user->lang['INITIAL_FEE'],$config['ms_group_join_amount']);
 			}
-			$line_desc = sprintf($user->lang['APPLICATION_PURCHASE'],$config['ms_billing_cycle'.$billing], $user->lang[$period_text[$config['ms_billing_cycle'.$billing.'_basis']]]);
-			$amount = $config['ms_billing_cycle'.$billing.'_amount'];
+			$line_desc = sprintf($user->lang['APPLICATION_PURCHASE'],$config['ms_billing_cycle'.$billing], $user->lang($config['ms_billing_cycle'.$billing.'_basis']));
+			$amount= $config['ms_billing_cycle'.$billing.'_amount'];
 			if ($amount==0)
 			{
 				$line_desc .= ' ' . $user->lang['DONATION'];
@@ -442,8 +444,8 @@ switch ($mode)
 				$payment_method = $row['portal'];
 				$subscriber_id = $row['subscriber_id'];
 				$payment_class =$payment_method . '_class';
-				$pc = new $payment_class;	
-				$pc->cancel_subscription($subscriber_id, $userid);
+				$p = new $payment_class;	
+				$p->cancel_subscription($subscriber_id, $groupid, $userid);
 			}
 			else
 			{
@@ -618,7 +620,7 @@ if ($display_user_details)
 				}
 				$template->assign_vars(array(
 					'APPROVE_PAYMENT'	=> $approve_payment,
-					'LIST_APPLICANTS'	=> $approve_applicants && $no_applicants,
+					'LIST_APPLICANTS'	=> $approve_applicants && !$no_applicants,
 				));
 				$db->sql_freeresult($result);
 			}

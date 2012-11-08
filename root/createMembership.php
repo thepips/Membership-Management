@@ -8,7 +8,6 @@
  *
  */
 
-
 /**
  * @ignore
  */
@@ -59,41 +58,61 @@ $language_file = 'mods/application';
 $versions = array(
 // Introduces individual groups per cycle
 	'0.1.0'	=> array(
-		'table_column_add' => array(
-			array(MEMBERSHIP_TABLE, 'date_joined', array('INT:11',0)),
-		),
 		'config_add' => array(
+			array('ms_application_forum', '2', 0),
+			array('ms_approval_required', '1', 0),
+			array('ms_group_join_amount', '5', 0),
+			array('ms_membership_date_format', 'D M d, Y', 0),
+			array('ms_subscription_extra_days', '0', 0),
+			array('ms_due_soon_period', '2', 0),
+			array('ms_due_soon_period_basis', 'm', 0),
+			array('ms_due_period', '2', 0),
+			array('ms_due_period_basis', 'm', 0),
+			array('ms_overdue_period', '2', 0),
+			array('ms_overdue_period_basis', 'm', 0),
+			array('ms_last_chance_period', '2', 0),
+			array('ms_last_chance_period_basis', 'm', 0),
+			array('ms_grace_period', '2', 0),
+			array('ms_grace_period_basis', 'm', 0),
+			array('ms_billing_cycle1', '1', 0),
+			array('ms_billing_cycle1_basis', 'y', 0),
+			array('ms_billing_cycle1_amount', '25', 0),
 			array('ms_billing_cycle1_group', '5', 0),
+			array('ms_billing_cycle2', '1', 0),
+			array('ms_billing_cycle2_basis', 'm', 0),
+			array('ms_billing_cycle2_amount', '4', 0),
 			array('ms_billing_cycle2_group', '5', 0),
+			array('ms_billing_cycle3', '3', 0),
+			array('ms_billing_cycle3_basis', 'm', 0),
+			array('ms_billing_cycle3_amount', '10', 0),
 			array('ms_billing_cycle3_group', '5', 0),
+			array('ms_billing_cycle4', '0', 0),
+			array('ms_billing_cycle4_basis', 'y', 0),
+			array('ms_billing_cycle4_amount', '0', 0),
 			array('ms_billing_cycle4_group', '5', 0),
+			array('ms_billing_cycle5', '0', 0),
+			array('ms_billing_cycle5_basis', 'y', 0),
+			array('ms_billing_cycle5_amount', '0', 0),
 			array('ms_billing_cycle5_group', '5', 0),
-			),
-	),
-// No changes required for V0.0.21
-	'0.0.20'	=> array(
-		'table_column_add' => array(
-			array(MEMBERSHIP_TABLE, 'comm_pref', array('INT:2',0)),
-		),
-	),
-	'0.0.19'	=> array(
-		'config_add' => array(
 			array('ms_default_group', '0', 0),
-		),
-	),
-	'0.0.17'	=> array(
-		'config_add' => array(
 			array('ms_registration', 'how membership is presented during registration', ''),
-		),
-	),
-	'0.0.13'	=> array(
-		'config_add' => array(
 			array('ms_associate_rank', '0', 0),
+			array('ms_rank', '0', 0),
+			array('ms_allow_associate',0),
+			array('ms_process_on_payment',0),
+			array('ms_period_start', '0', 0),
+			array('ms_enable_membership', '1', 0),
+			array('membership_gc', '86400', 0),
+			array('membership_last_gc', '0', true)
 		),
-	),
-// No changes required for V0.0.12
-	'0.0.11'	=> array(
+		'custom'	=> 'other_elements',
 		'module_add' => array(
+			array('acp', 'ACP_CAT_USERGROUP', 'ACP_MEMBERSHIP'),
+			array('acp', 'ACP_MEMBERSHIP', array(
+				'module_basename' => 'membership',
+				'modes' => array('settings', 'list'),
+				),
+			),
 			 array('acp', 'ACP_CAT_USERS', array(
 				'module_basename'	=> 'users',
 				'module_enabled'	=> 1,
@@ -106,43 +125,6 @@ $versions = array(
 				),
 			),
 		),
-		'config_add' => array(
-			array('ms_rank', '0', 0),
-		),
-	),
-	'0.0.10'	=> array(
-		'config_add' => array(
-			array('ms_allow_associate',0),
-			array('ms_process_on_payment',0),
-		),
-	),
-	'0.0.9'	=> array(
-		'table_column_add' => array(
-			array(MEMBERSHIP_TABLE, 'prev_renewal_date', array('INT:11',0)),
-			array(MEMBERSHIP_TABLE, 'billing', array('INT:1',0)),
-		),
-	),
-	'0.0.8'	=> array(
-		'config_add' => array(
-			array('ms_period_start', '0', 0),
-		),
-	),
-	'0.0.7'	=> array(		
-		'table_column_add' => array(			
-			array(IPN_LOG_TABLE, 'txn_type', array('VCHAR:20', '')), 
-		), 
-	),	
-	'0.0.5'	=> array(
-		'table_column_add' => array(
-			array(MEMBERSHIP_TABLE, 'associate_id', array('INT:11',0)),
-		),
-	),
-	'0.0.4'	=> array(
-		'config_add' => array(
-			array('ms_enable_membership', '1', 0),
-		)
-	),
-	'0.0.3'	=> array(
 		// Now to add some permission settings
 		'permission_add' => array(
 			array('a_approve_application', true),
@@ -152,23 +134,7 @@ $versions = array(
 			// Global Role permissions
 			array('ROLE_ADMIN_FULL', 'a_approve_application'),
 			array('ROLE_ADMIN_FULL', 'a_mark_paid'),
-		)
-	),
-	'0.0.2' => array(
-		'table_add' =>array(
-			array(IPN_LOG_TABLE, array(
-				'COLUMNS' => array(
-					'ipn_id' => array('UINT:10', NULL, 'auto_increment'),
-					'txn_id' => array('VCHAR:20', ''),
-					'creation_timestamp'=> array('TIMESTAMP', 0),
-					'ipn_data' => array('TEXT_UNI', ''),
-					),
-				'PRIMARY_KEY' => array('ipn_id')
-				)
-			)
 		),
-	),
-	'0.0.1' => array(
 		'table_add' =>array(
 			array(MEMBERSHIP_TABLE, array(
 				'COLUMNS' => array(
@@ -184,56 +150,19 @@ $versions = array(
 					'reminderdate' => array('INT:11', '0'),
 					'remindercount' => array('TINT:2', '0'),
 					'remindertype' => array('TINT:4','0'),
+					'date_joined' => array('INT:11',0),
+					'comm_pref' => array('INT:2',0),
+					'prev_renewal_date' => array('INT:11',0),
+					'billing' => array('INT:1',1),
+					'associate_id' => array('INT:11',0),
 				),
 				'PRIMARY_KEY' => array('membership_no'),
 				)
-			 )
+			 ),
 		 ),
-		'config_add' => array(
-			array('ms_application_forum', '2', 0),
-			array('ms_approval_required', '1', 0),
-			array('ms_group_join_amount', '5', 0),
-			array('ms_membership_date_format', 'D M d, Y', 0),
-			array('ms_subscription_extra_days', '0', 0),
-			array('ms_subscription_group', '5', 0),
-			array('ms_due_soon_period', '2', 0),
-			array('ms_due_soon_period_basis', 'm', 0),
-			array('ms_due_period', '2', 0),
-			array('ms_due_period_basis', 'm', 0),
-			array('ms_overdue_period', '2', 0),
-			array('ms_overdue_period_basis', 'm', 0),
-			array('ms_last_chance_period', '2', 0),
-			array('ms_last_chance_period_basis', 'm', 0),
-			array('ms_grace_period', '2', 0),
-			array('ms_grace_period_basis', 'm', 0),
-			array('ms_billing_cycle1', '1', 0),
-			array('ms_billing_cycle1_basis', 'y', 0),
-			array('ms_billing_cycle1_amount', '25', 0),
-			array('ms_billing_cycle2', '1', 0),
-			array('ms_billing_cycle2_basis', 'm', 0),
-			array('ms_billing_cycle2_amount', '4', 0),
-			array('ms_billing_cycle3', '3', 0),
-			array('ms_billing_cycle3_basis', 'm', 0),
-			array('ms_billing_cycle3_amount', '10', 0),
-			array('ms_billing_cycle4', '0', 0),
-			array('ms_billing_cycle4_basis', 'y', 0),
-			array('ms_billing_cycle4_amount', '0', 0),
-			array('ms_billing_cycle5', '0', 0),
-			array('ms_billing_cycle5_basis', 'y', 0),
-			array('ms_billing_cycle5_amount', '0', 0),
-			array('membership_gc', '86400', 0),
-			array('membership_last_gc', '0', true)
+		'table_column_add' => array(
+			array(SESSIONS_TABLE, 'shopping_basket', array('TEXT', '')),
 		),
-
-		'module_add' => array(
-			array('acp', 'ACP_CAT_USERGROUP', 'ACP_MEMBERSHIP'),
-			array('acp', 'ACP_MEMBERSHIP', array(
-				'module_basename' => 'membership',
-				'modes' => array('settings', 'list'),
-				),
-			),
-		),
-		'custom'	=> 'other_elements'
 	)
 );
 // Include the UMIL Auto file, it handles the rest
@@ -256,8 +185,6 @@ function other_elements($action, $version)
 	switch ($action)
 	{
 		case 'install':
-			$sql = 'ALTER TABLE ' . SESSIONS_TABLE . ' ADD shopping_basket TEXT NULL DEFAULT NULL';
-			$result = $db->sql_query($sql);
 
 			$sql = "SELECT MAX('field_order') AS max_field_order FROM " . PROFILE_FIELDS_TABLE;
 			$result=$db->sql_query($sql);
@@ -297,9 +224,6 @@ function other_elements($action, $version)
 		break;
 
 		case 'uninstall':
-			$sql = 'ALTER TABLE ' . SESSIONS_TABLE . ' DROP shopping_basket';
-			$db->sql_query($sql);
-
 			foreach ($profile_fields as $profile)
 			{
 				$sql = 'ALTER TABLE ' . PROFILE_FIELDS_DATA_TABLE . ' DROP COLUMN pf_' . $profile[0];

@@ -81,17 +81,23 @@ function mark_paid ($userid, $renewal_date='')
 	log_message('LOG_USER_GROUP_PAID', $userid);
 }
 
-function process_payment($userid, $uncleared, $billing='9')
+function retrieve_ug($userid, $variables)
 {
-	global $db, $config;
-	
-	$sql= 'SELECT m.*, ug.user_pending, ug.user_id as user_group_user_id 
+	global $db;
+	$sql= 'SELECT ' . $variables . ' 
+
 		FROM ' . MEMBERSHIP_TABLE . ' AS m
 		LEFT JOIN ' . USER_GROUP_TABLE . ' AS ug USING (group_id, user_id) ' .
 		"WHERE m.user_id = {$userid}";
 	$result		= $db->sql_query($sql);
 	$row		= $db->sql_fetchrow($result);
+	return ($row);
+}
 
+function process_payment($userid, $uncleared, $billing='9')
+{
+	global $db, $config;
+	$row = retrieve_ug($userid, 'm.*, ug.user_pending, ug.user_id as user_group_user_id');
 	if ($uncleared) // Cleared payment
 	{
 		log_message('LOG_USER_GROUP_PAYMENT_SENT', $userid,$config['ms_billing_cycle'.$billing.'_group']);
@@ -100,7 +106,6 @@ function process_payment($userid, $uncleared, $billing='9')
 	{
 		log_message('LOG_USER_GROUP_PAID', $userid,$row['group_id']);
 	}
-
 	if (empty($row) || empty($row['user_group_user_id']))
 	{
 		// Can't be a member
@@ -114,10 +119,13 @@ function process_payment($userid, $uncleared, $billing='9')
 	else
 	{
 		$is_member	= TRUE;
-		$billing	= $row['billing'];
-		$pending	= $row['user_pending'];
-		$groupid	= $row['group_id'];
-		$renewal_date = $row['renewal_date'];
+		if ($billing==9)
+		{
+			$billing	= $row['billing'];
+		}
+		$pending		= $row['user_pending'];
+		$groupid		= $row['group_id'];
+		$renewal_date	= $row['renewal_date'];
 		log_message('LOG_USER_GROUP_RENEWED', $userid,$groupid);
 		if ($pending && $config['ms_approval_required']==0)
 		{
@@ -155,7 +163,7 @@ function process_payment($userid, $uncleared, $billing='9')
 //	{
 //		$sql = 'UPDATE ' . MEMBERSHIP_TABLE . " 
 //			SET billing = '{$billing}', uncleared = 1, datepaid = " . time() . "	
-//			WHERE user_id = {$userid}";
+//			WHERE group_id = {$groupid} AND user_id = {$userid}";
 //		$result =$db->sql_query($sql);
 //	}
 //
@@ -214,8 +222,6 @@ function display_subscription_message($userid, $type='')
 		$is_pending	= $row['user_pending'];
 	}
 	
-	$renewal_date	= $user->format_date($row['renewal_date'],$config['ms_membership_date_format']);
-
 	$associate_name='';
 	if (!empty($row['associate_id']))
 	{
@@ -231,7 +237,6 @@ function display_subscription_message($userid, $type='')
 		'IS_MEMBER'				=> $is_member,
 		'UNCLEARED'				=> $row['uncleared'],
 		'PAYMENT_MESSAGE'		=> sprintf($user->lang['PAYMENT_PENDING'], $user->format_date($row['datepaid'],$config['ms_membership_date_format'])),
-		'RENEWAL_DATE'			=> $user->format_date($renewal_date,$config['ms_membership_date_format']),
 		'RENEWAL_ACTION'		=> append_sid("{$phpbb_root_path}application.$phpEx","mode=renew&i={$userid}"),
 		'MEMBERSHIP_NO'			=> $row['membership_no'],						
 		'CANCEL_SUB_ACTION' 	=> append_sid("{$phpbb_root_path}application.$phpEx","mode=cancel&i={$userid}"),
@@ -241,8 +246,16 @@ function display_subscription_message($userid, $type='')
 	));
 	if (empty($type) || $row['remindertype']>0)
 	{
+		if ($row['renewal_date']>0)
+		{
+			$renewal_date	= $user->format_date($row['renewal_date'],$config['ms_membership_date_format']);
 			$result['RENEWAL_MESSAGE']= sprintf($user->lang['RENEWAL_PROMPT_'.$row['remindertype']], $renewal_date);
-			$result['reminder_type']=$row['remindertype'];
+		}
+		else
+		{
+			$result['RENEWAL_MESSAGE'] = 'Your membership hasn\'t started yet';
+		}
+		$result['reminder_type']=$row['remindertype'];
 	}
 	return $result;
 }
@@ -316,7 +329,7 @@ function calc_date($billing_cycle=1, $billing_cycle_basis='y', $date=0)
 }
 
 
-function set_renewal_date($userid, $renew_until_date)
+function set_renewal_date($groupid, $userid, $renew_until_date)
 {
 	$sql_ary = array(
 		'remindercount'	=> 0,
@@ -478,9 +491,9 @@ function present_billing_cycle()
 			$result = $db->sql_query($sql);
 
 			$group_name = $db->sql_fetchfield('group_name');
+			$string=sprintf($user->lang['BILLING_CYCLE_CHARGE'],$money,$config[$key], $user->lang[$period_types[$config[$period_basis]]],$group_name);
+				$template->assign_block_vars('subscriptions', array(
 
-			$string=sprintf($user->lang['BILLING_CYCLE_CHARGE'],$money,$config[$key], $user->lang[$config[$period_basis]],$group_name);
-			$template->assign_block_vars('subscriptions', array(
 				'MESSAGE'			=>$string,
 				'TYPE'			=> $i
 				));
@@ -600,18 +613,21 @@ function subscription_enabled()
 	global $config;
 	$return = false;
 
-	$results = substr_in_array(array_keys($config), 'pp_subscription_allowed_');
-	foreach ($results as $result)
+	if (!empty($config['pp_enable_payment']))
 	{
-		if ($config[$result])
+		$results = substr_in_array(array_keys($config), 'pp_subscription_allowed_');
+		foreach ($results as $result)
 		{
-			$return=true;
-			break;
+			if ($config[$result])
+			{
+				$return=true;
+				break;
+			}
 		}
 	}
 	return $return;
-
 }
+
 function substr_in_array($haystack, $needle)
 {
 	$found = ARRAY();
